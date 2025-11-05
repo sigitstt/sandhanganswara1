@@ -3,183 +3,124 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Game Nulis Jawa (Super Cepat)</title>
+<title>Game Nulis Jawa Ultra Cepat</title>
 <style>
-html, body {
-  margin: 0; padding: 0;
-  background: #222; color: #fff;
-  font-family: sans-serif;
-  overflow: hidden;
-  touch-action: manipulation;
-}
-canvas {
-  display: block;
-  margin: auto;
-  background: #f4f4f4;
-  touch-action: none;
-}
+html,body{margin:0;padding:0;background:#222;color:#fff;text-align:center;font-family:sans-serif;overflow:hidden}
+canvas{display:block;margin:auto;background:#f4f4f4;touch-action:none}
 </style>
 </head>
 <body>
 <canvas id="game" width="400" height="680"></canvas>
 
-<!-- Audio -->
-<audio id="audioClick" src="tombolAksara.mp3" preload="auto"></audio>
-<audio id="audioBenar" src="benar.mp3" preload="auto"></audio>
-<audio id="audioSalah" src="salah.mp3" preload="auto"></audio>
-<audio id="audioHapus" src="hapus.mp3" preload="auto"></audio>
-<audio id="audioGameOver" src="gameOver.mp3" preload="auto"></audio>
-<audio id="audioFinish" src="applauseFINISH.mp3" preload="auto"></audio>
+<audio id="sClick" src="tombolAksara.mp3" preload="auto"></audio>
+<audio id="sBenar" src="benar.mp3" preload="auto"></audio>
+<audio id="sSalah" src="salah.mp3" preload="auto"></audio>
+<audio id="sHapus" src="hapus.mp3" preload="auto"></audio>
+<audio id="sOver" src="gameOver.mp3" preload="auto"></audio>
+<audio id="sFinish" src="applauseFINISH.mp3" preload="auto"></audio>
 
 <script>
-// ========================== DATA DASAR ==========================
-const latinWords = ["IKI","IKU","IDU","IGA","IBU","INGU","URA","ULA","ULI","UPA",
-"UJA","UJI","UGA","UGI","ECA","EKA","EWA","EKO","ORA","ORI",
-"EDI","NIKI","NITI","NIRA","NIKA","NIBA","NUHONI","NURI","NURU","NUTU",
-"NUSA","NEDHA","NEKA","NELA","NERAKA","CIRI","CINA","CELANA","CETHA","RAHINA",
-"RADI","RINA","RIKA","RIYAYA","RUPA","RENA","RECA","REKA","REGA","REGI",
-"REGU","REMA","REJA","KADI","KALI","KAPI","KAJI","KINA","KIRA","KUNA"];
-const jawaWords = ["ꦲꦶꦏꦶ","ꦲꦶꦏꦸ","ꦲꦶꦢꦸ","ꦲꦶꦒ","ꦲꦶꦧꦸ","ꦲꦶꦔꦸ","ꦲꦸꦫ","ꦲꦸꦭ","ꦲꦸꦭꦶ","ꦲꦸꦥ",
-"ꦲꦸꦗ","ꦲꦸꦗꦶ","ꦲꦸꦒ","ꦲꦸꦒꦶ","ꦲꦺꦕ","ꦲꦺꦏ","ꦲꦺꦮ","ꦲꦺꦏꦺꦴ","ꦲꦺꦴꦫ","ꦲꦺꦴꦫꦶ",
-"ꦲꦺꦢꦶ","ꦤꦶꦏꦶ","ꦤꦶꦠꦶ","ꦤꦶꦫ","ꦤꦶꦏ","ꦤꦶꦧ","ꦤꦸꦲꦺꦴꦤꦶ","ꦤꦸꦫꦶ","ꦤꦸꦫꦸ","ꦤꦸꦠꦸ",
-"ꦤꦸꦱ","ꦤꦼꦣ","ꦤꦺꦏ","ꦤꦼꦭ","ꦤꦼꦫꦏ","ꦕꦶꦫꦶ","ꦕꦶꦤ","ꦕꦼꦭꦤ","ꦕꦼꦛ","ꦫꦲꦶꦤ",
-"ꦫꦢꦶ","ꦫꦶꦤ","ꦫꦶꦏ","ꦫꦶꦪꦪ","ꦫꦸꦥ","ꦉꦤ","ꦉꦕ","ꦫꦺꦏ","ꦉꦒ","ꦉꦒꦶ",
-"ꦉꦒꦸ","ꦫꦺꦩ","ꦉꦗ","ꦏꦢꦶ","ꦏꦭꦶ","ꦏꦥꦶ","ꦏꦗꦶ","ꦏꦶꦤ","ꦏꦶꦫ","ꦏꦸꦤ"];
-const jawaLetters = ["ꦲ","ꦤ","ꦕ","ꦫ","ꦏ","ꦢ","ꦠ","ꦱ","ꦮ","ꦭ",
-"ꦥ","ꦣ","ꦗ","ꦪ","ꦚ","ꦩ","ꦒ","ꦧ","ꦛ","ꦔ",
-"ꦶ","ꦸ","ꦺ","ꦺꦴ","ꦼ","ꦉ","ꦊ","ꦂ","ꦁ","ꦃ",
-"ꦿ","ꦽ","ꦾ","꧇","꧀"];
+// === DATA ===
+const latin=["IKI","IKU","IDU","IGA","IBU","INGU","URA","ULA","ULI","UPA","UJA","UJI","UGA","UGI","ECA","EKA","EWA","EKO","ORA","ORI"];
+const jawa=["ꦲꦶꦏꦶ","ꦲꦶꦏꦸ","ꦲꦶꦢꦸ","ꦲꦶꦒ","ꦲꦶꦧꦸ","ꦲꦶꦔꦸ","ꦲꦸꦫ","ꦲꦸꦭ","ꦲꦸꦭꦶ","ꦲꦸꦥ","ꦲꦸꦗ","ꦲꦸꦗꦶ","ꦲꦸꦒ","ꦲꦸꦒꦶ","ꦲꦺꦕ","ꦲꦺꦏ","ꦲꦺꦮ","ꦲꦺꦏꦺꦴ","ꦲꦺꦴꦫ","ꦲꦺꦴꦫꦶ"];
+const aksara=["ꦲ","ꦤ","ꦕ","ꦫ","ꦏ","ꦢ","ꦠ","ꦱ","ꦮ","ꦭ","ꦥ","ꦣ","ꦗ","ꦪ","ꦚ","ꦩ","ꦒ","ꦧ","ꦛ","ꦔ","ꦶ","ꦸ","ꦺ","ꦺꦴ","ꦼ","ꦉ","ꦊ","ꦂ","ꦁ","ꦃ","ꦿ","ꦽ","ꦾ","꧇","꧀"];
 
-// ========================== VARIABEL ==========================
-const cvs = document.getElementById("game");
-const ctx = cvs.getContext("2d");
-ctx.textAlign="center"; ctx.textBaseline="middle";
-let currentLatin="", currentJawa="", typed="";
-let timeLeft=600, score=0, lives=3, running=true;
-let timer;
+// === VARIABEL ===
+let ctx=document.getElementById("game").getContext("2d");
+let latinKata="",jawaKata="",typed="";
+let waktu=180,nyawa=3,skor=0,aktif=true,timer;
 
-// ========================== AUDIO ==========================
-const sounds = {
-  key: document.getElementById("audioClick"),
-  benar: document.getElementById("audioBenar"),
-  salah: document.getElementById("audioSalah"),
-  hapus: document.getElementById("audioHapus"),
-  over: document.getElementById("audioGameOver"),
-  finish: document.getElementById("audioFinish")
-};
-function playSound(s){ s.currentTime=0; s.play().catch(()=>{}); }
+// === AUDIO ===
+const sClick=sClickEl("sClick"),sBenar=sClickEl("sBenar"),sSalah=sClickEl("sSalah"),
+sHapus=sClickEl("sHapus"),sOver=sClickEl("sOver"),sFinish=sClickEl("sFinish");
+function sClickEl(id){return document.getElementById(id);}
+function play(s){try{s.currentTime=0;s.play();}catch(e){}}
 
-// ========================== GAME LOGIC ==========================
-function newWord(){
-  if(latinWords.length===0){ finish(true); return; }
-  const i=Math.floor(Math.random()*latinWords.length);
-  currentLatin=latinWords.splice(i,1)[0];
-  currentJawa=jawaWords.splice(i,1)[0];
+// === FUNGSI ===
+function kataBaru(){
+  if(latin.length===0){selesai(true);return;}
+  let i=Math.floor(Math.random()*latin.length);
+  latinKata=latin.splice(i,1)[0];
+  jawaKata=jawa.splice(i,1)[0];
   typed="";
+  gambar();
 }
 
-function drawButton(x,y,w,h,r,text,color,border){
-  ctx.fillStyle=color; ctx.strokeStyle=border; ctx.lineWidth=2;
-  ctx.beginPath(); ctx.roundRect(x,y,w,h,r); ctx.fill(); ctx.stroke();
-  ctx.fillStyle="#000"; ctx.font="28px 'nyk Ngayogyan New',sans-serif";
-  ctx.fillText(text,x+w/2,y+h/2+3);
-}
-
-function drawGame(){
-  ctx.clearRect(0,0,cvs.width,cvs.height);
-  // Info bar
-  ctx.font="16px Arial"; ctx.fillStyle="#000";
-  ctx.fillText(`Wektu: ${timeLeft}s  Nyawa: ${lives}  Skor: ${score}`,200,20);
-  // Kata
+function gambar(){
+  ctx.clearRect(0,0,400,680);
+  ctx.fillStyle="#000"; ctx.textAlign="center";
+  ctx.font="16px Arial"; ctx.fillText(`Waktu:${waktu}s | Nyawa:${nyawa} | Skor:${skor}`,200,20);
   ctx.font="20px Arial"; ctx.fillText("Tulisan Latin:",200,60);
-  ctx.font="28px Arial"; ctx.fillStyle="blue"; ctx.fillText(currentLatin,200,90);
-  ctx.font="20px Arial"; ctx.fillStyle="#000"; ctx.fillText("Tulisan Jawa:",200,130);
-  ctx.font="34px 'nyk Ngayogyan New'"; ctx.fillStyle="blue"; ctx.fillText(typed,200,170);
+  ctx.font="26px Arial"; ctx.fillStyle="blue"; ctx.fillText(latinKata,200,90);
+  ctx.fillStyle="#000"; ctx.font="20px Arial"; ctx.fillText("Tulisan Jawa:",200,130);
+  ctx.fillStyle="blue"; ctx.font="34px 'nyk Ngayogyan New',sans-serif"; ctx.fillText(typed,200,170);
 
-  // Papan huruf
-  const cols=5, size=60, gap=8, startX=40, startY=220;
-  for(let i=0;i<jawaLetters.length;i++){
-    const x=startX+(i%cols)*(size+gap);
-    const y=startY+Math.floor(i/cols)*(size+gap);
-    drawButton(x,y,size,size,8,jawaLetters[i],"#FEFDBC","#000");
+  // papan
+  const col=5,size=60,gap=8,startX=40,startY=210;
+  for(let i=0;i<aksara.length;i++){
+    let x=startX+(i%col)*(size+gap);
+    let y=startY+Math.floor(i/col)*(size+gap);
+    ctx.fillStyle="#FEFDBC"; ctx.strokeStyle="#000"; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.roundRect(x,y,size,size,8); ctx.fill(); ctx.stroke();
+    ctx.fillStyle="#000"; ctx.font="26px 'nyk Ngayogyan New',sans-serif"; ctx.fillText(aksara[i],x+size/2,y+size/2+4);
   }
 
-  // Tombol bawah
+  // tombol bawah
   ctx.fillStyle="#A00101"; ctx.fillRect(60,610,100,40);
   ctx.fillStyle="#055205"; ctx.fillRect(240,610,100,40);
   ctx.font="20px Arial"; ctx.fillStyle="#fff";
-  ctx.fillText("GOSOK",110,630);
-  ctx.fillText("KIRIM",290,630);
+  ctx.fillText("GOSOK",110,630); ctx.fillText("KIRIM",290,630);
 }
 
-function getClick(x,y){
-  // Tombol bawah
+function klik(x,y){
+  if(!aktif)return;
+  // tombol bawah
   if(y>610 && y<650){
-    if(x>60 && x<160){ // GOSOK
-      if(typed.length>0){ typed=typed.slice(0,-1); playSound(sounds.hapus); }
-    } else if(x>240 && x<340){ // KIRIM
-      if(typed===currentJawa){
-        score++; playSound(sounds.benar); newWord();
-      } else {
-        lives--; playSound(sounds.salah);
-        if(lives<=0){ finish(false); }
-      }
+    if(x>60&&x<160){ if(typed.length){typed=typed.slice(0,-1);play(sHapus);gambar();} }
+    else if(x>240&&x<340){
+      if(typed===jawaKata){skor++;play(sBenar);kataBaru();}
+      else{nyawa--;play(sSalah); if(nyawa<=0)selesai(false); else gambar();}
     }
     return;
   }
-
-  // Huruf papan
-  const cols=5, size=60, gap=8, startX=40, startY=220;
-  for(let i=0;i<jawaLetters.length;i++){
-    const bx=startX+(i%cols)*(size+gap);
-    const by=startY+Math.floor(i/cols)*(size+gap);
-    if(x>bx && x<bx+size && y>by && y<by+size){
-      typed+=jawaLetters[i];
-      playSound(sounds.key);
-      return;
+  // huruf
+  const col=5,size=60,gap=8,startX=40,startY=210;
+  for(let i=0;i<aksara.length;i++){
+    let bx=startX+(i%col)*(size+gap);
+    let by=startY+Math.floor(i/col)*(size+gap);
+    if(x>bx&&x<bx+size&&y>by&&y<by+size){
+      typed+=aksara[i];play(sClick);gambar();return;
     }
   }
 }
 
-cvs.addEventListener("click",e=>{
-  if(!running) return;
-  const rect=cvs.getBoundingClientRect();
-  getClick(e.clientX-rect.left, e.clientY-rect.top);
+function selesai(menang){
+  aktif=false; clearInterval(timer);
+  ctx.fillStyle=menang?"#CCF7F5":"#FFC4C4"; ctx.fillRect(0,0,400,680);
+  ctx.fillStyle="#000"; ctx.textAlign="center";
+  ctx.font="32px Arial"; ctx.fillText(menang?"Game Selesai":"Game Over",200,300);
+  ctx.font="24px Arial"; ctx.fillText(`Skor: ${(skor/latin.length*100).toFixed(1)}`,200,340);
+  ctx.font="18px Arial"; ctx.fillText("Refresh kanggo main maneh",200,380);
+  play(menang?sFinish:sOver);
+}
+
+function mulai(){
+  kataBaru();
+  timer=setInterval(()=>{
+    if(!aktif)return;
+    waktu--;
+    if(waktu<=0){selesai(false);}
+    else gambar();
+  },1000);
+  gambar();
+}
+
+document.getElementById("game").addEventListener("click",e=>{
+  let r=e.target.getBoundingClientRect();
+  klik(e.clientX-r.left,e.clientY-r.top);
 });
 
-function finish(win){
-  running=false;
-  clearInterval(timer);
-  ctx.fillStyle=win?"#CCF7F5":"#FFC4C4";
-  ctx.fillRect(0,0,cvs.width,cvs.height);
-  ctx.fillStyle="#000";
-  ctx.font="32px Arial";
-  ctx.fillText(win?"Game Finish":"Game Over",200,300);
-  ctx.font="26px Arial";
-  ctx.fillText(`Skor: ${(score/60*100).toFixed(1)}`,200,340);
-  ctx.font="20px Arial";
-  ctx.fillText("Refresh kanggo main maneh",200,400);
-  playSound(win?sounds.finish:sounds.over);
-}
-
-function tick(){
-  if(!running) return;
-  timeLeft--;
-  if(timeLeft<=0){ finish(false); }
-}
-
-function loop(){
-  if(running) drawGame();
-  requestAnimationFrame(loop);
-}
-
-// ========================== MULAI GAME ==========================
-function start(){
-  newWord();
-  timer=setInterval(tick,1000);
-  loop();
-}
-window.onload=start;
+window.onload=mulai;
 </script>
 </body>
 </html>

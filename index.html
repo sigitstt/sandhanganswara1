@@ -3,194 +3,158 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Game Nulis Jawa (Cepat)</title>
+<title>Game Nulis Jawa Super Cepat</title>
 <style>
-body {
-    font-family: Arial, sans-serif;
-    text-align: center;
-    margin: 0;
-    background: #f4f4f4;
+html, body {
+  margin: 0; padding: 0; background: #222;
+  color: #fff; font-family: sans-serif;
+  overflow: hidden; touch-action: manipulation;
 }
-h1, h2 { color: #333; margin: 10px 0; }
-.info {
-    background: #333; color: #fff; padding: 8px;
-}
-.output, .output1, .output2 {
-    margin: 8px 0;
-    font-family: 'nyk Ngayogyan New', sans-serif;
-}
-.output { font-size: 22px; }
-.output1 { font-size: 26px; color: blue; }
-.output2 { font-size: 30px; color: blue; min-height: 40px; }
 canvas {
-    background: #FEFDBC;
-    margin: 10px auto;
-    display: block;
-    border: 2px solid #000;
-    border-radius: 10px;
+  display: block; margin: auto;
+  background: #f4f4f4;
+  touch-action: none;
 }
-.controls {
-    display: flex; justify-content: center; gap: 15px; margin-top: 15px;
-}
-button {
-    padding: 10px 20px;
-    font-size: 16px;
-    color: white;
-    border-radius: 8px;
-    border: 2px solid #333;
-}
-#deleteButton { background: #A00101; }
-#confirmButton { background: #055205; }
 </style>
 </head>
 <body>
-
-<h1>Game Nulis Jawa</h1>
-<h2>(Versi Cepat Android)</h2>
-
-<div class="info" id="gameInfo">
-    <span id="time">Wektu: 600 s</span> | 
-    <span id="lives">Nyawa: 3</span> | 
-    <span id="score">Skor: 0</span>
-</div>
-
-<div class="output">Tulisan Latin:</div>
-<div class="output1" id="latinWord"></div>
-<div class="output">Tulisan Jawa:</div>
-<div class="output2" id="jawaWord"></div>
-
-<canvas id="board" width="330" height="480"></canvas>
-
-<div class="controls">
-    <button id="deleteButton">GOSOK</button>
-    <button id="confirmButton">KIRIM</button>
-</div>
-
-<audio id="audioClick" src="tombolAksara.mp3" preload="auto"></audio>
-<audio id="audioBenar" src="benar.mp3" preload="auto"></audio>
-<audio id="audioSalah" src="salah.mp3" preload="auto"></audio>
-<audio id="audioHapus" src="hapus.mp3" preload="auto"></audio>
+<canvas id="game" width="360" height="640"></canvas>
 
 <script>
-const latinWords = ["IKI","IKU","IDU","IBU","INGU","ULA","UPA","ECA","EKA","EKO"];
-const jawaWords  = ["ꦲꦶꦏꦶ","ꦲꦶꦏꦸ","ꦲꦶꦢꦸ","ꦲꦶꦧꦸ","ꦲꦶꦔꦸ","ꦲꦸꦭ","ꦲꦸꦥ","ꦲꦺꦕ","ꦲꦺꦏ","ꦲꦺꦏꦺꦴ"];
+const cvs = document.getElementById('game');
+const ctx = cvs.getContext('2d');
+ctx.textAlign = "center";
+ctx.textBaseline = "middle";
+
 const letters = ["ꦲ","ꦤ","ꦕ","ꦫ","ꦏ","ꦢ","ꦠ","ꦱ","ꦮ","ꦭ",
 "ꦥ","ꦗ","ꦪ","ꦩ","ꦒ","ꦧ","ꦔ","ꦶ","ꦸ","ꦺ","ꦺꦴ","ꦼ","ꦉ"];
+const latinWords = ["IKI","IKU","IBU","ULA","UPA","EKA","EKO","ORA","NIKI","NUTU"];
+const jawaWords  = ["ꦲꦶꦏꦶ","ꦲꦶꦏꦸ","ꦲꦶꦧꦸ","ꦲꦸꦭ","ꦲꦸꦥ","ꦲꦺꦏ","ꦲꦺꦏꦺꦴ","ꦲꦺꦴꦫ","ꦤꦶꦏꦶ","ꦤꦸꦠꦸ"];
 
-let currentLatin="", currentJawa="", timeLeft=600, score=0, lives=3, timer;
-const latinWordEl = document.getElementById("latinWord");
-const jawaWordEl  = document.getElementById("jawaWord");
-const timeEl      = document.getElementById("time");
-const scoreEl     = document.getElementById("score");
-const livesEl     = document.getElementById("lives");
+let currentLatin="", currentJawa="", typed="";
+let timeLeft = 600, score = 0, lives = 3;
+let running = true;
 
-const clickSound  = document.getElementById("audioClick");
-const benarSound  = document.getElementById("audioBenar");
-const salahSound  = document.getElementById("audioSalah");
-const hapusSound  = document.getElementById("audioHapus");
+function pickWord() {
+  if (!latinWords.length) return finish(true);
+  const i = Math.floor(Math.random()*latinWords.length);
+  currentLatin = latinWords.splice(i,1)[0];
+  currentJawa  = jawaWords.splice(i,1)[0];
+  typed = "";
+}
+pickWord();
 
-const canvas = document.getElementById("board");
-const ctx = canvas.getContext("2d");
-const btnSize = 60, gap = 5;
-const cols = 5;
-
-function play(snd) {
-    try { snd.currentTime=0; snd.play(); } catch(e){}
+function beep(freq=600,dur=100){
+  try {
+    const ctxA = new (window.AudioContext||window.webkitAudioContext)();
+    const osc = ctxA.createOscillator();
+    const gain = ctxA.createGain();
+    osc.type='square'; osc.frequency.value=freq;
+    osc.connect(gain); gain.connect(ctxA.destination);
+    osc.start();
+    gain.gain.setValueAtTime(0.1,ctxA.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001,ctxA.currentTime+dur/1000);
+    osc.stop(ctxA.currentTime+dur/1000);
+  } catch(e){}
 }
 
-function drawBoard() {
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    ctx.font = "30px 'nyk Ngayogyan New'";
-    ctx.textAlign="center"; ctx.textBaseline="middle";
-    for (let i=0;i<letters.length;i++) {
-        const x = (i % cols) * (btnSize+gap) + btnSize/2 + 10;
-        const y = Math.floor(i/cols)*(btnSize+gap) + btnSize/2 + 10;
-        ctx.fillStyle="#FEFDBC";
-        ctx.strokeStyle="#000";
-        ctx.lineWidth=2;
-        ctx.beginPath();
-        ctx.roundRect(x-btnSize/2,y-btnSize/2,btnSize,btnSize,8);
-        ctx.fill();
-        ctx.stroke();
-        ctx.fillStyle="#000";
-        ctx.fillText(letters[i], x, y+3);
-    }
+function drawText(t,x,y,size=24,color="#000"){
+  ctx.fillStyle=color;
+  ctx.font=size+"px 'nyk Ngayogyan New', sans-serif";
+  ctx.fillText(t,x,y);
 }
 
-function getLetterAt(x,y){
-    for (let i=0;i<letters.length;i++){
-        const cx = (i % cols)*(btnSize+gap)+10;
-        const cy = Math.floor(i/cols)*(btnSize+gap)+10;
-        if (x>cx && x<cx+btnSize && y>cy && y<cy+btnSize) return letters[i];
-    }
-    return null;
+function drawUI(){
+  ctx.clearRect(0,0,cvs.width,cvs.height);
+  // header
+  drawText(`Wektu: ${timeLeft}s  Nyawa:${lives}  Skor:${score}`,180,20,16,"#000");
+  // latin
+  drawText("Tulisan Latin:",180,60,18,"#000");
+  drawText(currentLatin,180,90,30,"blue");
+  // jawa
+  drawText("Tulisan Jawa:",180,140,18,"#000");
+  drawText(typed,180,180,34,"#000");
+  // board
+  const size=60,gap=8,cols=5;
+  let x0=30,y0=230;
+  for(let i=0;i<letters.length;i++){
+    const x=x0+(i%cols)*(size+gap);
+    const y=y0+Math.floor(i/cols)*(size+gap);
+    ctx.fillStyle="#FEFDBC";
+    ctx.strokeStyle="#000";
+    ctx.lineWidth=2;
+    ctx.beginPath();
+    ctx.roundRect(x,y,size,size,8);
+    ctx.fill(); ctx.stroke();
+    drawText(letters[i],x+size/2,y+size/2,28,"#000");
+  }
+  // buttons
+  ctx.fillStyle="#A00101"; ctx.fillRect(50,580,100,40);
+  ctx.fillStyle="#055205"; ctx.fillRect(210,580,100,40);
+  drawText("GOSOK",100,600,20,"#fff");
+  drawText("KIRIM",260,600,20,"#fff");
 }
 
-canvas.addEventListener("click", e=>{
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const letter = getLetterAt(x,y);
-    if(letter){
-        jawaWordEl.textContent += letter;
-        play(clickSound);
+function getClick(x,y){
+  // tombol bawah
+  if (y>580 && y<620){
+    if (x<160){ // delete
+      typed=typed.slice(0,-1); beep(200);
+    } else { // confirm
+      if (typed===currentJawa){
+        score++; beep(800);
+        pickWord();
+      } else {
+        lives--; beep(100);
+        if(lives<=0) finish(false);
+      }
     }
+    return;
+  }
+  // huruf
+  const size=60,gap=8,cols=5;
+  let x0=30,y0=230;
+  for(let i=0;i<letters.length;i++){
+    const bx=x0+(i%cols)*(size+gap);
+    const by=y0+Math.floor(i/cols)*(size+gap);
+    if (x>bx && x<bx+size && y>by && y<by+size){
+      typed+=letters[i];
+      beep(400);
+      return;
+    }
+  }
+}
+
+cvs.addEventListener("click",e=>{
+  if(!running) return;
+  const rect=cvs.getBoundingClientRect();
+  const x=e.clientX-rect.left;
+  const y=e.clientY-rect.top;
+  getClick(x,y);
 });
 
-document.getElementById("deleteButton").onclick = ()=>{
-    jawaWordEl.textContent = jawaWordEl.textContent.slice(0,-1);
-    play(hapusSound);
-};
-document.getElementById("confirmButton").onclick = ()=>{
-    if(jawaWordEl.textContent === currentJawa){
-        score++;
-        play(benarSound);
-        scoreEl.textContent = `Skor: ${(score/latinWords.length*100).toFixed(1)}`;
-        nextWord();
-    } else {
-        lives--;
-        play(salahSound);
-        livesEl.textContent = `Nyawa: ${lives}`;
-        if(lives<=0) endGame(false);
-    }
-};
-
-function nextWord(){
-    if(latinWords.length===0) return endGame(true);
-    const i=Math.floor(Math.random()*latinWords.length);
-    currentLatin=latinWords.splice(i,1)[0];
-    currentJawa=jawaWords.splice(i,1)[0];
-    latinWordEl.textContent=currentLatin;
-    jawaWordEl.textContent="";
-}
-
 function tick(){
-    timeLeft--;
-    timeEl.textContent=`Wektu: ${timeLeft} s`;
-    if(timeLeft<=0){ endGame(false); return; }
-    timer=setTimeout(tick,1000);
+  if(!running) return;
+  timeLeft--;
+  if(timeLeft<=0) finish(false);
 }
 
-function endGame(finish){
-    clearTimeout(timer);
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    ctx.fillStyle=finish?"#CFF":"#FCC";
-    ctx.fillRect(0,0,canvas.width,canvas.height);
-    ctx.fillStyle="#000";
-    ctx.font="24px Arial";
-    ctx.textAlign="center";
-    ctx.fillText(finish?"Game Finish":"Game Over",canvas.width/2,canvas.height/2-20);
-    ctx.fillText(`Skor: ${(score/10*100).toFixed(1)}`,canvas.width/2,canvas.height/2+10);
-    ctx.fillText("Refresh kanggo main maneh",canvas.width/2,canvas.height/2+40);
+function finish(win){
+  running=false;
+  ctx.fillStyle=win?"#CCF7F5":"#FFC4C4";
+  ctx.fillRect(0,0,cvs.width,cvs.height);
+  drawText(win?"Game Finish":"Game Over",180,300,36,"#000");
+  drawText(`Skor: ${(score/10*100).toFixed(1)}`,180,350,28,"#000");
+  drawText("Refresh kanggo main maneh",180,400,18,"#000");
+  beep(win?800:200,300);
 }
 
-function start(){
-    drawBoard();
-    nextWord();
-    tick();
+function loop(){
+  drawUI();
+  requestAnimationFrame(loop);
 }
-
-window.onload=start;
+setInterval(tick,1000);
+loop();
 </script>
 </body>
 </html>

@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Nulis Jawa</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        h1 {
+            margin-top: 20px;
+            color: #333;
+        }
+		
+		h2 {
+            margin-top: 20px;
+            color: #333;
+        }
+
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(5, 60px);
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .button {
+            width: 60px;
+            height: 60px;
+            background-color: #FEFDBC;
+            border: 2px solid #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            /*font-family: 'Noto Sans Javanese', sans-serif; */
+            font-family: 'nyk Ngayogyan New', sans-serif;
+            color: #333
+            cursor: pointer;
+            border-radius: 8px;
+            transition: transform 0.1s;
+        }
+
+        .button:active {
+            transform: translateY(5px);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .control-button {
+            padding: 10px 20px;
+            background-color: #055205;
+            border: 2px solid #333;
+            color:white;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .control-button.delete {
+            background-color: #A00101;
+            color: white
+        }
+
+        .control-button:active {
+            transform: translateY(5px);
+        }
+
+        .info {
+            margin-top: 10px;
+            font-size: 18px;
+            border: 1px solid white;
+            background-color: #333;
+            padding: 10px;
+            color: white;
+        }
+        .output {
+            margin: 10px 0;
+            font-size: 26px;
+            height: 26px;  
+            align-items:baseline;  
+            font-family: 'nyk Ngayogyan New', sans-serif; 
+        }
+        .output1 {
+            font-size: 26px;
+            color: blue;
+            height: auto;  
+            align-items: center;  
+            font-family: 'nyk Ngayogyan New', sans-serif;  
+        }
+
+        .output2 {            
+            margin: 10px 0;
+            font-size: 30px;
+            color:blue;
+            height: 70px;  
+            align-items: center;  
+            font-family: 'nyk Ngayogyan New', sans-serif;      
+                }
+    </style>
+</head>
+<body>
+    <h1>Game Nulis Jawa</h1>
+	<h2>(Sandhangan Swara)</h2>
+
+    <div class="info" id="gameInfo">
+        <span id="time">Wektu: 300 s</span> | <span id="lives">Nyawa: 3</span> | <span id="score">Skor: 0</span>
+    </div>
+
+    <div class="output" >Tulisan Latin : </div>
+    <div class="output1" id="latinWord">Kata Latin </div>
+    <div class="output" >Tulisan Jawa : </div>
+    <div class="output2" id="jawaWord">Huruf Jawa: </div>
+
+    <div class="game-board" id="jawaBoard"></div>
+
+    <div class="controls">
+        <button class="control-button delete" id="deleteButton">GOSOK</button>
+		<button class="control-button confirm" id="confirmButton">KIRIM</button>   
+    </div>
+	
+	<audio id="audioTombolAksara" src="tombolAksara.mp3"></audio>
+	<audio id="audioBenar" src="benar.mp3"></audio>
+	<audio id="audioSalah" src="salah.mp3"></audio>
+	<audio id="audioHapus" src="hapus.mp3"></audio>
+	<audio id="audioGameOver" src="gameOver.mp3"></audio>
+	<audio id="audioFinish" src="applauseFINISH.mp3"></audio>
+
+    <!-- ############################################################# -->
+    <script>
+        const latinWords = ["IKI", "IKU", "IDU", "IGA", "IBU", "INGU", "URA", "ULA", "ULI", "UPA",
+							"UJA", "UJI", "UGA", "UGI", "ECA", "EKA", "EWA", "EKO", "ORA", "ORI",
+							"EDI", "NIKI", "NITI", "NIRA", "NIKA", "NIBA", "NUHONI", "NURI", "NURU", "NUTU",
+							"NUSA", "NEDHA", "NEKA", "NELA", "NERAKA", "CIRI", "CINA", "CELANA", "CETHA", "RAHINA",
+							"RADI", "RINA", "RIKA", "RIYAYA", "RUPA", "RENA", "RECA", "REKA", "REGA", "REGI",
+							"REGU", "REMA", "REJA", "KADI", "KALI", "KAPI", "KAJI", "KINA", "KIRA", "KUNA"];
+        const jawaWords = ["ꦲꦶꦏꦶ", "ꦲꦶꦏꦸ", "ꦲꦶꦢꦸ", "ꦲꦶꦒ", "ꦲꦶꦧꦸ", "ꦲꦶꦔꦸ", "ꦲꦸꦫ", "ꦲꦸꦭ", "ꦲꦸꦭꦶ", "ꦲꦸꦥ",
+							"ꦲꦸꦗ", "ꦲꦸꦗꦶ", "ꦲꦸꦒ", "ꦲꦸꦒꦶ", "ꦲꦺꦕ", "ꦲꦺꦏ", "ꦲꦺꦮ", "ꦲꦺꦏꦺꦴ", "ꦲꦺꦴꦫ", "ꦲꦺꦴꦫꦶ",
+							"ꦲꦺꦢꦶ", "ꦤꦶꦏꦶ", "ꦤꦶꦠꦶ", "ꦤꦶꦫ", "ꦤꦶꦏ", "ꦤꦶꦧ", "ꦤꦸꦲꦺꦴꦤꦶ", "ꦤꦸꦫꦶ", "ꦤꦸꦫꦸ", "ꦤꦸꦠꦸ",
+							"ꦤꦸꦱ", "ꦤꦼꦣ", "ꦤꦺꦏ", "ꦤꦼꦭ", "ꦤꦼꦫꦏ", "ꦕꦶꦫꦶ", "ꦕꦶꦤ", "ꦕꦼꦭꦤ", "ꦕꦼꦛ", "ꦫꦲꦶꦤ",
+							"ꦫꦢꦶ", "ꦫꦶꦤ", "ꦫꦶꦏ", "ꦫꦶꦪꦪ", "ꦫꦸꦥ", "ꦉꦤ", "ꦉꦕ", "ꦫꦺꦏ", "ꦉꦒ", "ꦉꦒꦶ",
+							"ꦉꦒꦸ", "ꦫꦺꦩ", "ꦉꦗ", "ꦏꦢꦶ", "ꦏꦭꦶ", "ꦏꦥꦶ", "ꦏꦗꦶ", "ꦏꦶꦤ", "ꦏꦶꦫ", "ꦏꦸꦤ"];
+        const jawaLetters = ["ꦲ", "ꦤ", "ꦕ", "ꦫ", "ꦏ", "ꦢ", "ꦠ", "ꦱ", "ꦮ", "ꦭ", 
+							"ꦥ", "ꦣ", "ꦗ", "ꦪ", "ꦚ", "ꦩ", "ꦒ", "ꦧ", "ꦛ", "ꦔ", 
+							"ꦶ", "ꦸ", "ꦺ", "ꦺꦴ", "ꦼ", "ꦉ", "ꦊ", "ꦂ", "ꦁ", "ꦃ", 
+							"ꦿ", "ꦽ", "ꦾ", "꧇", "꧀"];
+
+        let currentLatin = "";
+        let currentJawa = "";
+        let timeLeft = 300; //waktu yg disediakan dalam detik, samakan dg GameInfo di atas
+        let score = 0;
+        let lives = 3; // nyawa
+
+        const latinWordEl = document.getElementById("latinWord");
+        const jawaWordEl = document.getElementById("jawaWord");
+        const timeEl = document.getElementById("time");
+        const scoreEl = document.getElementById("score");
+        const livesEl = document.getElementById("lives");
+        const jawaBoard = document.getElementById("jawaBoard");
+		const audioTombolAksara = document.getElementById("audioTombolAksara");
+		const audioBenar = document.getElementById("audioBenar");
+		const audioSalah = document.getElementById("audioSalah");
+		const audioHapus = document.getElementById("audioHapus");
+		const audioGameOver = document.getElementById("audioGameOver");
+		const audioFinish = document.getElementById("audioFinish");
+
+        function chooseNewWord() {
+            if (latinWords.length === 0) {
+              //  alert("Selamat! Anda telah menyelesaikan permainan.");
+              //***************************************************
+                gameFinish();
+              //*******************************************************
+          
+                }
+            const index = Math.floor(Math.random() * latinWords.length);
+            currentLatin = latinWords.splice(index, 1)[0];
+            currentJawa = jawaWords.splice(index, 1)[0];
+            latinWordEl.textContent = ` ${currentLatin}`;
+            jawaWordEl.textContent = " ";
+            }
+
+        function createJawaBoard() {
+            jawaBoard.innerHTML = "";
+            jawaLetters.forEach(letter => {
+                const button = document.createElement("div");
+                button.className = "button";
+                button.textContent = letter;
+                button.addEventListener("click", () => {
+                    jawaWordEl.textContent += letter;
+					
+					// Memutar suara saat tombol aksara Jawa ditekan
+					audioTombolAksara.currentTime = 0; // Mengatur ulang waktu audio
+					audioTombolAksara.play(); // Memutar audio
+					
+                });
+                jawaBoard.appendChild(button);
+            });
+        }
+
+        document.getElementById("confirmButton").addEventListener("click", () => {
+            if (jawaWordEl.textContent.replace(" ", "") === currentJawa) {
+                score++;
+					// Memutar suara saat tombol aksara Jawa ditekan
+					audioBenar.currentTime = 0; // Mengatur ulang waktu audio
+					audioBenar.play(); // Memutar audio
+				
+                scoreEl.textContent = `Skor: ${(score/30*100).toFixed(1)}`; //61 adalah jml soal
+                chooseNewWord();
+            } else {
+                lives--;
+					// Memutar suara saat tombol aksara Jawa ditekan
+					audioSalah.currentTime = 0; // Mengatur ulang waktu audio
+					audioSalah.play(); // Memutar audio
+					
+                livesEl.textContent = `Nyawa: ${lives}`;
+                if (lives <= 0) {
+                    gameOver();
+                }
+            }
+        });
+
+        document.getElementById("deleteButton").addEventListener("click", () => {
+            const text = jawaWordEl.textContent.replace("Huruf Jawa: ", "");
+            jawaWordEl.textContent = text.slice(0, -1);
+					// Memutar suara saat tombol aksara Jawa ditekan
+					audioHapus.currentTime = 0; // Mengatur ulang waktu audio
+					audioHapus.play(); // Memutar audio
+        });
+
+// Fungsi untuk menangani Game Over
+function startGame() {
+    chooseNewWord(); // Pilih kata awal
+    createJawaBoard(); // Buat papan permainan
+    timer = setInterval(() => {
+        timeLeft--; // Kurangi waktu
+        timeEl.textContent = `Waktu: ${timeLeft} s`;
+        if (timeLeft <= 0 || lives <= 0) {
+            gameOver(); // Panggil fungsi Game Over jika waktu habis atau nyawa habis
+        }
+    }, 1000); // Update setiap 1 detik
+}
+
+function gameOver() {
+    clearInterval(timer); // Hentikan timer permainan
+    
+    // Sembunyikan elemen game utama
+    const gameElements = document.querySelectorAll("#gameInfo, #jawaBoard, .controls, .output, .output1, .output2");
+    gameElements.forEach(el => el.style.display = "none");
+
+    // Tambahkan elemen Game Over di layar
+    const gameOverMessage = document.createElement("div");
+    gameOverMessage.style.position = "fixed";
+    gameOverMessage.style.top = "30%";
+    gameOverMessage.style.left = "50%";
+    gameOverMessage.style.transform = "translate(-50%, -50%)";
+    gameOverMessage.style.backgroundColor = "#FFC4C4";
+    gameOverMessage.style.padding = "20px";
+    gameOverMessage.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.2)";
+    gameOverMessage.style.textAlign = "center";
+    gameOverMessage.innerHTML = `
+        <h1>Game Over</h1>
+        <h2>Skor Anda: </h2>
+        <h1>${(score/30*100).toFixed(1)}</h1>
+        <h3>Sabar nggih ...</h3>
+        <h3>kanggo main maneh</h3>
+        <h2>Refresh halaman! </h2>
+    `;
+					// Memutar suara saat tombol aksara Jawa ditekan
+					audioGameOver.currentTime = 0; // Mengatur ulang waktu audio
+					audioGameOver.play(); // Memutar audio
+    document.body.appendChild(gameOverMessage); // Tampilkan pesan
+}
+//???????????????????????????????????????????????????????
+function gameFinish() {
+    clearInterval(timer); // Hentikan timer permainan
+    
+    // Sembunyikan elemen game utama
+    const gameElements = document.querySelectorAll("#gameInfo, #jawaBoard, .controls, .output, .output1, .output2");
+    gameElements.forEach(el => el.style.display = "none");
+
+    // Tambahkan elemen Game Finish di layar
+    const gameFinishMessage = document.createElement("div");
+    gameFinishMessage.style.position = "fixed";
+    gameFinishMessage.style.top = "30%";
+    gameFinishMessage.style.left = "50%";
+    gameFinishMessage.style.transform = "translate(-50%, -50%)";
+    gameFinishMessage.style.backgroundColor = "#CCF7F5";
+    gameFinishMessage.style.padding = "20px";
+    gameFinishMessage.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.2)";
+    gameFinishMessage.style.textAlign = "center";
+    gameFinishMessage.innerHTML = `
+        <h1>Game Finish</h1>
+        <h2>Skor Anda: </h2>
+        <h1>${(score/30*100).toFixed(1)}</h1>
+        <h3>Alhamdulillah ...</h3>
+        <h3>kanggo main maneh</h3>
+        <h2>Refresh halaman! </h2>
+    `;
+					// Memutar suara saat tombol aksara Jawa ditekan
+					audioFinish.currentTime = 0; // Mengatur ulang waktu audio
+					audioFinish.play(); // Memutar audio
+					
+    document.body.appendChild(gameFinishMessage); // Tampilkan pesan
+}
+//????????????????????????????????????????????????????
+
+window.onload = startGame;
+
+    </script>
+</body>
+</html>
+

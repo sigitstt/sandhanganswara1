@@ -134,15 +134,122 @@
         <button class="control-button delete" id="deleteButton">GOSOK</button>
         <button class="control-button confirm" id="confirmButton">KIRIM</button>   
     </div>
-	
-    <audio id="audioTombolAksara" src="tombolAksara.mp3" preload="auto"></audio>
-    <audio id="audioBenar" src="benar.mp3" preload="auto"></audio>
-    <audio id="audioSalah" src="salah.mp3" preload="auto"></audio>
-    <audio id="audioHapus" src="hapus.mp3" preload="auto"></audio>
-    <audio id="audioGameOver" src="gameOver.mp3" preload="auto"></audio>
-    <audio id="audioFinish" src="applauseFINISH.mp3" preload="auto"></audio>
 
     <script>
+        // --- WEB AUDIO API (Suara Langsung Tanpa File MP3 & Bebas Delay) ---
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        // Suara Ketukan Tombol Aksara (Beep Pendek Ringan)
+        function playSoundTombol() {
+            initAudio();
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(600, audioCtx.currentTime); // Frekuensi 600Hz
+            gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.05);
+        }
+
+        // Suara Tombol Hapus / Gosok
+        function playSoundHapus() {
+            initAudio();
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.08);
+        }
+
+        // Suara Jawaban Benar (Nada Nada Tinggi / Ting!)
+        function playSoundBenar() {
+            initAudio();
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // Tone C5
+            osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // Tone E5
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+        }
+
+        // Suara Jawaban Salah (Nada Rendah / Tet!)
+        function playSoundSalah() {
+            initAudio();
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.25);
+        }
+
+        // Suara Game Over
+        function playSoundGameOver() {
+            initAudio();
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.6);
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.6);
+        }
+
+        // Suara Game Finish
+        function playSoundFinish() {
+            initAudio();
+            if (!audioCtx) return;
+            const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+            notes.forEach((freq, index) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime + (index * 0.1));
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime + (index * 0.1));
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + (index * 0.1) + 0.2);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(audioCtx.currentTime + (index * 0.1));
+                osc.stop(audioCtx.currentTime + (index * 0.1) + 0.2);
+            });
+        }
+
+        // --- DAFTAR SOAL DAN KUNCI JAWABAN ---
         const latinWords = [
             "NANDUR", "MANGAN SATE", "BAPAK TUKU", "IKI", "IKU", "IDU", "IGA", "IBU", "INGU", "URA", "ULA", 
             "ULI", "UPA", "UJA", "UJI", "UGA", "UGI", "ECA", "EKA", "EWA", "EKO", "ORA", "ORI",
@@ -183,46 +290,6 @@
         const livesEl = document.getElementById("lives");
         const jawaBoard = document.getElementById("jawaBoard");
 
-        const audioTombolAksara = document.getElementById("audioTombolAksara");
-        const audioBenar = document.getElementById("audioBenar");
-        const audioSalah = document.getElementById("audioSalah");
-        const audioHapus = document.getElementById("audioHapus");
-        const audioGameOver = document.getElementById("audioGameOver");
-        const audioFinish = document.getElementById("audioFinish");
-
-        // FUNGSI PEMUTAR AUDIO BEBAS LAG DAN DIIZINKAN BROWSER MOBILE
-        function playSound(audioElement) {
-            if (!audioElement) return;
-            
-            // Reset ke awal lalu putar tanpa clone (lolos Autoplay Policy Android)
-            audioElement.currentTime = 0;
-            const playPromise = audioElement.play();
-            
-            if (playPromise !== undefined) {
-                playPromise.catch(error => {
-                    console.log("Audio diblokir browser:", error);
-                });
-            }
-        }
-
-        // UNLOCK AUDIO: Memicu izin audio saat pengguna pertama kali menyentuh layar
-        function unlockAudio() {
-            const sounds = [audioTombolAksara, audioBenar, audioSalah, audioHapus, audioGameOver, audioFinish];
-            sounds.forEach(audio => {
-                if (audio) {
-                    audio.play().then(() => {
-                        audio.pause();
-                        audio.currentTime = 0;
-                    }).catch(() => {});
-                }
-            });
-            document.removeEventListener("touchstart", unlockAudio);
-            document.removeEventListener("click", unlockAudio);
-        }
-
-        document.addEventListener("touchstart", unlockAudio, { once: true });
-        document.addEventListener("click", unlockAudio, { once: true });
-
         function chooseNewWord() {
             if (latinWords.length === 0) {
                 gameFinish();
@@ -245,7 +312,7 @@
                 
                 button.addEventListener("click", () => {
                     jawaWordEl.textContent += letter;
-                    playSound(audioTombolAksara);
+                    playSoundTombol(); // Suara instan
                 });
                 
                 jawaBoard.appendChild(button);
@@ -258,12 +325,12 @@
 
             if (inputUser === kunciJawaban) {
                 score++;
-                playSound(audioBenar);
+                playSoundBenar();
                 scoreEl.textContent = `Skor: ${((score / totalQuestions) * 100).toFixed(1)}`;
                 chooseNewWord();
             } else {
                 lives--;
-                playSound(audioSalah);
+                playSoundSalah();
                 livesEl.textContent = `Nyawa: ${lives}`;
                 if (lives <= 0) {
                     gameOver();
@@ -276,7 +343,7 @@
             if (text.length > 0) {
                 jawaWordEl.textContent = Array.from(text).slice(0, -1).join('');
             }
-            playSound(audioHapus);
+            playSoundHapus();
         });
 
         function startGame() {
@@ -313,7 +380,7 @@
                 <h3>kanggo main maneh</h3>
                 <h2>Refresh halaman! </h2>
             `;
-            playSound(audioGameOver);
+            playSoundGameOver();
             document.body.appendChild(gameOverMessage);
         }
 
@@ -339,7 +406,7 @@
                 <h3>kanggo main maneh</h3>
                 <h2>Refresh halaman! </h2>
             `;
-            playSound(audioFinish);
+            playSoundFinish();
             document.body.appendChild(gameFinishMessage);
         }
 

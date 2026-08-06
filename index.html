@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game Nulis Jawa</title>
     
-    <!-- PENTING: Memuat Font Noto Sans Javanese dari Google Fonts agar browser bisa merender PASANGAN -->
+    <!-- Memuat Font Noto Sans Javanese dari Google Fonts agar browser merender PASANGAN dengan rapi -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Javanese:wght@400..700&display=swap" rel="stylesheet">
@@ -17,6 +17,8 @@
             margin: 0;
             padding: 0;
             background-color: #f4f4f4;
+            /* Mencegah zoom tidak sengaja saat tombol diketik cepat di HP */
+            touch-action: manipulation;
         }
 
         h1, h2 {
@@ -41,12 +43,15 @@
             align-items: center;
             justify-content: center;
             font-size: 24px;
-            /* Prioritaskan Noto Sans Javanese agar pasangan terbentuk sempurna */
             font-family: 'Noto Sans Javanese', 'nyk Ngayogyan New', sans-serif;
             color: #333;
             cursor: pointer;
             border-radius: 8px;
             transition: transform 0.1s;
+            /* Mengeliminasi delay sentuhan 300ms di Chrome/WebView Android */
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
         }
 
         .button:active {
@@ -69,6 +74,9 @@
             font-size: 16px;
             cursor: pointer;
             transition: transform 0.1s;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
         }
 
         .control-button.delete {
@@ -129,15 +137,15 @@
         <button class="control-button confirm" id="confirmButton">KIRIM</button>   
     </div>
 	
-    <audio id="audioTombolAksara" src="tombolAksara.mp3"></audio>
-    <audio id="audioBenar" src="benar.mp3"></audio>
-    <audio id="audioSalah" src="salah.mp3"></audio>
-    <audio id="audioHapus" src="hapus.mp3"></audio>
-    <audio id="audioGameOver" src="gameOver.mp3"></audio>
-    <audio id="audioFinish" src="applauseFINISH.mp3"></audio>
+    <audio id="audioTombolAksara" src="tombolAksara.mp3" preload="auto"></audio>
+    <audio id="audioBenar" src="benar.mp3" preload="auto"></audio>
+    <audio id="audioSalah" src="salah.mp3" preload="auto"></audio>
+    <audio id="audioHapus" src="hapus.mp3" preload="auto"></audio>
+    <audio id="audioGameOver" src="gameOver.mp3" preload="auto"></audio>
+    <audio id="audioFinish" src="applauseFINISH.mp3" preload="auto"></audio>
 
     <script>
-        // Soal Latin
+        // Daftar Kata Latin (Termasuk yang Membutuhkan Pasangan)
         const latinWords = [
             "NANDUR", "MANGAN SATE", "BAPAK TUKU", "IKI", "IKU", "IDU", "IGA", "IBU", "INGU", "URA", "ULA", 
             "ULI", "UPA", "UJA", "UJI", "UGA", "UGI", "ECA", "EKA", "EWA", "EKO", "ORA", "ORI",
@@ -147,19 +155,17 @@
             "REGU", "REMA", "REJA", "KADI", "KALI", "KAPI", "KAJI", "KINA", "KIRA", "KUNA"
         ];
 
-        // Kunci Jawaban Aksara Jawa (Pastikan urutan Unicode sama persis dengan yang diketik siswa)
-        // NANDUR = ꦤ (na) + ꦤ (na) + ꧀ (pangkon) + ꦢ (da) + ꦸ (suku) + ꦂ (layar)
-        // MANGAN SATE = ꦩ (ma) + ꦔ (nga) + ꦤ (na) + ꧀ (pangkon) + ꦱ (sa) + ꦠ (ta) + ꦺ (taling)
+        // Kunci Jawaban Aksara Jawa Sesuai Urutan Pengetikan
         const jawaWords = [
             "ꦤꦤ꧀ꦢꦸꦂ", "ꦩꦔꦤ꧀ꦱꦠꦺ", "ꦧꦥꦏ꧀ꦠꦸꦏꦸ", "ꦲꦶꦏꦶ", "ꦲꦶꦏꦸ", "ꦲꦶꦢꦸ", "ꦲꦶꦒ", "ꦲꦶꦧꦸ", "ꦲꦶꦔꦸ", "ꦲꦸꦫ", "ꦲꦸꦭ", 
-            "ꦲꦸꦭꦶ", "ꦲꦸꦥ", "ꦲꦸꦗ", "ꦲꦸꦗꦶ", "ꦲꦸꦒ", "ꦲꦸꦒꦶ", "ꦲꦺꦕ", "ꦲꦺꦏ", "ꦲꦺꦮ", "ꦲꦺꦏꦺꦴ", "ꦲꦺꦴꦫ", "ꦲꦺꦴꦫꦶ",
+            "ꦲꦸꦭꦶ", "ꦲꦸꦥ", "ꦲꦸꦗ", "ꦲꦸꦗꦶ", "ꦲꦸꦒ", "ꦲꦸꦒꦶ", "ꦲꦺꦕ", "ꦲꦺꦏ", "ꦲꦺꦮ", "ꦲꦺꦏꦺꦴ", "ꦲꦺꦴꦫ", "ꦲꦺꦴꦫ궶",
             "ꦲꦺꦢꦶ", "ꦤꦶꦏꦶ", "ꦤꦶꦠꦶ", "ꦤꦶꦫ", "ꦤꦶꦏ", "ꦤꦶꦧ", "ꦤꦸꦲꦺꦴꦤꦶ", "ꦤꦸꦫꦶ", "ꦤꦸꦫꦸ", "ꦤꦸꦠꦸ",
             "ꦤꦸꦱ", "ꦤꦼꦣ", "ꦤꦺꦏ", "ꦤꦼꦭ", "ꦤꦼꦫꦏ", "ꦕꦶꦫꦶ", "ꦕꦶꦤ", "ꦕꦼꦭꦤ", "ꦕꦼꦛ", "ꦫꦲꦶꦤ",
             "ꦫꦢꦶ", "ꦫꦶꦤ", "ꦫꦶꦏ", "ꦫꦶꦪꦪ", "ꦫꦸꦥ", "ꦉꦤ", "ꦉꦕ", "ꦫꦺꦏ", "ꦉꦒ", "ꦉꦒꦶ",
             "ꦉꦒꦸ", "ꦫꦺꦩ", "ꦉꦗ", "ꦏꦢꦶ", "ꦏꦭꦶ", "ꦏꦥꦶ", "ꦏꦗꦶ", "ꦏꦶꦤ", "ꦏꦶꦫ", "ꦏꦸꦤ"
         ];
 
-        // Tombol Papan Aksara Sesuai File Asli
+        // Papan Tombol Sesuai dengan susunan awal milik Anda
         const jawaLetters = [
             "ꦲ", "ꦤ", "ꦕ", "ꦫ", "ꦏ", "ꦢ", "ꦠ", "ꦱ", "ꦮ", "ꦭ", 
             "ꦥ", "ꦣ", "ꦗ", "ꦪ", "ꦚ", "ꦩ", "ꦒ", "ꦧ", "ꦛ", "ꦔ", 
@@ -189,6 +195,18 @@
         const audioGameOver = document.getElementById("audioGameOver");
         const audioFinish = document.getElementById("audioFinish");
 
+        // FUNGSI KHUSUS UNTUK MEMUTAR AUDIO TANPA DELAY DI HP
+        function playSound(audioElement) {
+            if (!audioElement) return;
+            try {
+                // Memutar clone audio secara asinkron
+                const soundClone = audioElement.cloneNode();
+                soundClone.play().catch(e => console.log("Audio play prevented:", e));
+            } catch (err) {
+                console.log(err);
+            }
+        }
+
         function chooseNewWord() {
             if (latinWords.length === 0) {
                 gameFinish();
@@ -199,7 +217,7 @@
             currentJawa = jawaWords.splice(index, 1)[0];
             
             latinWordEl.textContent = currentLatin;
-            jawaWordEl.textContent = ""; // Mengosongkan jawaban tanpa spasi
+            jawaWordEl.textContent = "";
         }
 
         function createJawaBoard() {
@@ -208,32 +226,29 @@
                 const button = document.createElement("div");
                 button.className = "button";
                 button.textContent = letter;
+                
                 button.addEventListener("click", () => {
                     jawaWordEl.textContent += letter;
-                    audioTombolAksara.currentTime = 0;
-                    audioTombolAksara.play();
+                    // Memutar audio cepat tanpa membuat UI macet
+                    playSound(audioTombolAksara);
                 });
+                
                 jawaBoard.appendChild(button);
             });
         }
 
         document.getElementById("confirmButton").addEventListener("click", () => {
-            // Membandingkan teks inputan dengan kunci jawaban (mengabaikan spasi berlebih)
             const inputUser = jawaWordEl.textContent.trim();
             const kunciJawaban = currentJawa.trim();
 
             if (inputUser === kunciJawaban) {
                 score++;
-                audioBenar.currentTime = 0;
-                audioBenar.play();
-                
+                playSound(audioBenar);
                 scoreEl.textContent = `Skor: ${((score / totalQuestions) * 100).toFixed(1)}`;
                 chooseNewWord();
             } else {
                 lives--;
-                audioSalah.currentTime = 0;
-                audioSalah.play();
-                
+                playSound(audioSalah);
                 livesEl.textContent = `Nyawa: ${lives}`;
                 if (lives <= 0) {
                     gameOver();
@@ -244,11 +259,10 @@
         document.getElementById("deleteButton").addEventListener("click", () => {
             let text = jawaWordEl.textContent;
             if (text.length > 0) {
-                // Menghapus 1 karakter unicode paling belakang
+                // Menghapus 1 karakter unicode terbelakang
                 jawaWordEl.textContent = Array.from(text).slice(0, -1).join('');
             }
-            audioHapus.currentTime = 0;
-            audioHapus.play();
+            playSound(audioHapus);
         });
 
         function startGame() {
@@ -285,8 +299,7 @@
                 <h3>kanggo main maneh</h3>
                 <h2>Refresh halaman! </h2>
             `;
-            audioGameOver.currentTime = 0;
-            audioGameOver.play();
+            playSound(audioGameOver);
             document.body.appendChild(gameOverMessage);
         }
 
@@ -312,8 +325,7 @@
                 <h3>kanggo main maneh</h3>
                 <h2>Refresh halaman! </h2>
             `;
-            audioFinish.currentTime = 0;
-            audioFinish.play();
+            playSound(audioFinish);
             document.body.appendChild(gameFinishMessage);
         }
 

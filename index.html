@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game Nulis Jawa</title>
     
-    <!-- Memuat Font Noto Sans Javanese dari Google Fonts agar browser merender PASANGAN dengan rapi -->
+    <!-- Memuat Font Noto Sans Javanese dari Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Javanese:wght@400..700&display=swap" rel="stylesheet">
@@ -17,7 +17,6 @@
             margin: 0;
             padding: 0;
             background-color: #f4f4f4;
-            /* Mencegah zoom tidak sengaja saat tombol diketik cepat di HP */
             touch-action: manipulation;
         }
 
@@ -48,7 +47,6 @@
             cursor: pointer;
             border-radius: 8px;
             transition: transform 0.1s;
-            /* Mengeliminasi delay sentuhan 300ms di Chrome/WebView Android */
             touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
@@ -145,7 +143,6 @@
     <audio id="audioFinish" src="applauseFINISH.mp3" preload="auto"></audio>
 
     <script>
-        // Daftar Kata Latin (Termasuk yang Membutuhkan Pasangan)
         const latinWords = [
             "NANDUR", "MANGAN SATE", "BAPAK TUKU", "IKI", "IKU", "IDU", "IGA", "IBU", "INGU", "URA", "ULA", 
             "ULI", "UPA", "UJA", "UJI", "UGA", "UGI", "ECA", "EKA", "EWA", "EKO", "ORA", "ORI",
@@ -155,17 +152,15 @@
             "REGU", "REMA", "REJA", "KADI", "KALI", "KAPI", "KAJI", "KINA", "KIRA", "KUNA"
         ];
 
-        // Kunci Jawaban Aksara Jawa Sesuai Urutan Pengetikan
         const jawaWords = [
             "ꦤꦤ꧀ꦢꦸꦂ", "ꦩꦔꦤ꧀ꦱꦠꦺ", "ꦧꦥꦏ꧀ꦠꦸꦏꦸ", "ꦲꦶꦏꦶ", "ꦲꦶꦏꦸ", "ꦲꦶꦢꦸ", "ꦲꦶꦒ", "ꦲꦶꦧꦸ", "ꦲꦶꦔꦸ", "ꦲꦸꦫ", "ꦲꦸꦭ", 
-            "ꦲꦸꦭꦶ", "ꦲꦸꦥ", "ꦲꦸꦗ", "ꦲꦸꦗꦶ", "ꦲꦸꦒ", "ꦲꦸꦒꦶ", "ꦲꦺꦕ", "ꦲꦺꦏ", "ꦲꦺꦮ", "ꦲꦺꦏꦺꦴ", "ꦲꦺꦴꦫ", "ꦲꦺꦴꦫ궶",
+            "ꦲꦸꦭꦶ", "ꦲꦸꦥ", "ꦲꦸꦗ", "ꦲꦸꦗꦶ", "ꦲꦸꦒ", "ꦲꦸꦒꦶ", "ꦲꦺꦕ", "ꦲꦺꦏ", "ꦲꦺꦮ", "ꦲꦺꦏꦺꦴ", "ꦲꦺꦴꦫ", "ꦲꦺꦴꦫꦶ",
             "ꦲꦺꦢꦶ", "ꦤꦶꦏꦶ", "ꦤꦶꦠꦶ", "ꦤꦶꦫ", "ꦤꦶꦏ", "ꦤꦶꦧ", "ꦤꦸꦲꦺꦴꦤꦶ", "ꦤꦸꦫꦶ", "ꦤꦸꦫꦸ", "ꦤꦸꦠꦸ",
             "ꦤꦸꦱ", "ꦤꦼꦣ", "ꦤꦺꦏ", "ꦤꦼꦭ", "ꦤꦼꦫꦏ", "ꦕꦶꦫꦶ", "ꦕꦶꦤ", "ꦕꦼꦭꦤ", "ꦕꦼꦛ", "ꦫꦲꦶꦤ",
             "ꦫꦢꦶ", "ꦫꦶꦤ", "ꦫꦶꦏ", "ꦫꦶꦪꦪ", "ꦫꦸꦥ", "ꦉꦤ", "ꦉꦕ", "ꦫꦺꦏ", "ꦉꦒ", "ꦉꦒꦶ",
             "ꦉꦒꦸ", "ꦫꦺꦩ", "ꦉꦗ", "ꦏꦢꦶ", "ꦏꦭꦶ", "ꦏꦥꦶ", "ꦏꦗꦶ", "ꦏꦶꦤ", "ꦏꦶꦫ", "ꦏꦸꦤ"
         ];
 
-        // Papan Tombol Sesuai dengan susunan awal milik Anda
         const jawaLetters = [
             "ꦲ", "ꦤ", "ꦕ", "ꦫ", "ꦏ", "ꦢ", "ꦠ", "ꦱ", "ꦮ", "ꦭ", 
             "ꦥ", "ꦣ", "ꦗ", "ꦪ", "ꦚ", "ꦩ", "ꦒ", "ꦧ", "ꦛ", "ꦔ", 
@@ -195,17 +190,38 @@
         const audioGameOver = document.getElementById("audioGameOver");
         const audioFinish = document.getElementById("audioFinish");
 
-        // FUNGSI KHUSUS UNTUK MEMUTAR AUDIO TANPA DELAY DI HP
+        // FUNGSI PEMUTAR AUDIO BEBAS LAG DAN DIIZINKAN BROWSER MOBILE
         function playSound(audioElement) {
             if (!audioElement) return;
-            try {
-                // Memutar clone audio secara asinkron
-                const soundClone = audioElement.cloneNode();
-                soundClone.play().catch(e => console.log("Audio play prevented:", e));
-            } catch (err) {
-                console.log(err);
+            
+            // Reset ke awal lalu putar tanpa clone (lolos Autoplay Policy Android)
+            audioElement.currentTime = 0;
+            const playPromise = audioElement.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.catch(error => {
+                    console.log("Audio diblokir browser:", error);
+                });
             }
         }
+
+        // UNLOCK AUDIO: Memicu izin audio saat pengguna pertama kali menyentuh layar
+        function unlockAudio() {
+            const sounds = [audioTombolAksara, audioBenar, audioSalah, audioHapus, audioGameOver, audioFinish];
+            sounds.forEach(audio => {
+                if (audio) {
+                    audio.play().then(() => {
+                        audio.pause();
+                        audio.currentTime = 0;
+                    }).catch(() => {});
+                }
+            });
+            document.removeEventListener("touchstart", unlockAudio);
+            document.removeEventListener("click", unlockAudio);
+        }
+
+        document.addEventListener("touchstart", unlockAudio, { once: true });
+        document.addEventListener("click", unlockAudio, { once: true });
 
         function chooseNewWord() {
             if (latinWords.length === 0) {
@@ -229,7 +245,6 @@
                 
                 button.addEventListener("click", () => {
                     jawaWordEl.textContent += letter;
-                    // Memutar audio cepat tanpa membuat UI macet
                     playSound(audioTombolAksara);
                 });
                 
@@ -259,7 +274,6 @@
         document.getElementById("deleteButton").addEventListener("click", () => {
             let text = jawaWordEl.textContent;
             if (text.length > 0) {
-                // Menghapus 1 karakter unicode terbelakang
                 jawaWordEl.textContent = Array.from(text).slice(0, -1).join('');
             }
             playSound(audioHapus);

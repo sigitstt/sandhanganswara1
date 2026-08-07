@@ -46,13 +46,13 @@
             color: #333;
             cursor: pointer;
             border-radius: 8px;
-            transition: transform 0.1s;
+            transition: transform 0.05s ease-out; /* Transisi dipercepat */
             touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
         }
 
-/* Kelas baru untuk efek turun instan saat diketik cepat */
+        /* Kelas baru untuk efek turun instan saat diketik cepat */
         .button.pressed, .control-button.pressed, .button:active, .control-button:active {
             transform: translateY(5px);
             background-color: #e6e5a0; /* Sedikit menggelap agar efek ketikan lebih terasa */
@@ -73,7 +73,7 @@
             border-radius: 8px;
             font-size: 16px;
             cursor: pointer;
-            transition: transform 0.7s;
+            transition: transform 0.05s ease-out;
             touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
@@ -85,10 +85,6 @@
 
         .control-button.delete {
             background-color: #A00101;
-        }
-
-        .control-button:active {
-            transform: translateY(5px);
         }
 
         .info {
@@ -126,7 +122,7 @@
     <h2>(Sandhangan & Pasangan)</h2>
 
     <div class="info" id="gameInfo">
-        <span id="time">Wektu: 300 s</span> | <span id="lives">Nyawa: 3</span> | <span id="score">Skor: 0</span>
+        <span id="time">Wektu: 30 s</span> | <span id="lives">Nyawa: 3</span> | <span id="score">Skor: 0</span>
     </div>
 
     <div class="output">Tulisan Latin :</div>
@@ -162,7 +158,7 @@
             const gain = audioCtx.createGain();
             osc.type = 'sine';
             osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-            gain.gain.setValueAtTime(0.9, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.6, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
             osc.connect(gain);
             gain.connect(audioCtx.destination);
@@ -177,7 +173,7 @@
             const gain = audioCtx.createGain();
             osc.type = 'triangle';
             osc.frequency.setValueAtTime(300, audioCtx.currentTime);
-            gain.gain.setValueAtTime(0.9, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.7, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
             osc.connect(gain);
             gain.connect(audioCtx.destination);
@@ -193,7 +189,7 @@
             osc.type = 'sine';
             osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); 
             osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); 
-            gain.gain.setValueAtTime(0.9, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.7, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
             osc.connect(gain);
             gain.connect(audioCtx.destination);
@@ -208,7 +204,7 @@
             const gain = audioCtx.createGain();
             osc.type = 'sawtooth';
             osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-            gain.gain.setValueAtTime(0.9, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.6, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
             osc.connect(gain);
             gain.connect(audioCtx.destination);
@@ -224,7 +220,7 @@
             osc.type = 'sawtooth';
             osc.frequency.setValueAtTime(200, audioCtx.currentTime);
             osc.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.6);
-            gain.gain.setValueAtTime(0.9, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.8, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
             osc.connect(gain);
             gain.connect(audioCtx.destination);
@@ -241,13 +237,21 @@
                 const gain = audioCtx.createGain();
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(freq, audioCtx.currentTime + (index * 0.1));
-                gain.gain.setValueAtTime(0.9, audioCtx.currentTime + (index * 0.1));
+                gain.gain.setValueAtTime(0.7, audioCtx.currentTime + (index * 0.1));
                 gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + (index * 0.1) + 0.2);
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
                 osc.start(audioCtx.currentTime + (index * 0.1));
                 osc.stop(audioCtx.currentTime + (index * 0.1) + 0.2);
             });
+        }
+
+        // FUNGSI KHUSUS EFEK TEKANAN INSTAN DI HP
+        function triggerPressAnimation(element) {
+            element.classList.add("pressed");
+            setTimeout(() => {
+                element.classList.remove("pressed");
+            }, 100); // Tombol akan tampak tertekan selama 100 milidetik
         }
 
         // --- DAFTAR SOAL DAN KUNCI JAWABAN ---
@@ -269,7 +273,6 @@
             "ꦉꦒꦸ", "ꦫꦺꦩ", "ꦉꦗ", "ꦏꦢꦶ", "ꦏꦭꦶ", "ꦏꦥꦶ", "ꦏꦗꦶ", "ꦏꦶꦤ", "ꦏꦶꦫ", "ꦏꦸꦤ"
         ];
 
-        // PAPAN TOMBOL UTAMA (35 Tombol)
         const jawaLettersPrimary = [
             "ꦲ", "ꦤ", "ꦕ", "ꦫ", "ꦏ", 
             "ꦢ", "ꦠ", "ꦱ", "ꦮ", "ꦭ", 
@@ -280,21 +283,20 @@
             "ꦿ", "ꦽ", "ꦾ", "꧇", "꧀"
         ];
 
-        // PAPAN TOMBOL KEDUA (35 Tombol: Murda, Swara, Mahaprana & Tanda Baca)
         const jawaLettersSecondary = [
-            "ꦟ", "ꦑ", "ꦠ꦳", "ꦯ", "ꦦ", // Na, Ka, Ta, Sa, Pa Murda
-            "ꦙ", "ꦓ", "ꦨ", "ꦯ꦳", "ꦖ", // Ja, Ga, Ba Murda, Kh, Ch
-            "ꦄ", "ꦆ", "ꦈ", "ꦌ", "ꦎ", // Swara: A, I, U, E, O
-            "ꦑ꦳", "ꦥ꦳", "ꦥ꦳꦳", "ꦗ꦳", "ꦒ꦳", // Rekan: Kh, Fa, Va, Za, Gh
-            "꧈", "꧉", "꧊", "꧋", "꧌", // Pada Lingsa, Lungsi, Pangkat, dll
-            "꧍", "ꧏ", "꧐", "꧑", "꧒", // Pada Andap, Munggang, Angka 0, 1, 2
-            "꧓", "꧔", "꧕", "꧖", "꧗"  // Angka 3, 4, 5, 6, 7
+            "ꦟ", "ꦑ", "ꦠ꦳", "ꦯ", "ꦦ", 
+            "ꦙ", "ꦓ", "ꦨ", "ꦯ꦳", "ꦖ", 
+            "ꦄ", "ꦆ", "ꦈ", "ꦌ", "ꦎ", 
+            "ꦑ꦳", "ꦥ꦳", "ꦥ꦳꦳", "ꦗ꦳", "ꦒ꦳", 
+            "꧈", "꧉", "꧊", "꧋", "꧌", 
+            "꧍", "ꧏ", "꧐", "꧑", "꧒", 
+            "꧓", "꧔", "꧕", "꧖", "꧗"
         ];
 
-        let currentBoardMode = 1; // 1 = Primary, 2 = Secondary
+        let currentBoardMode = 1; 
         let currentLatin = "";
         let currentJawa = "";
-        let timeLeft = 300;
+        let timeLeft = 30;
         let score = 0;
         let lives = 3;
         let timer = null;
@@ -330,7 +332,9 @@
                 button.className = "button";
                 button.textContent = letter;
                 
-                button.addEventListener("click", () => {
+                // Memicu efek tombol turun saat jari PERTAMA KALI menyentuh (pointerdown)
+                button.addEventListener("pointerdown", () => {
+                    triggerPressAnimation(button);
                     jawaWordEl.textContent += letter;
                     playSoundTombol();
                 });
@@ -339,8 +343,8 @@
             });
         }
 
-        // TOGGLE TOMBOL SHIFT (Pindah Antara Papan 1 & Papan 2)
-        shiftButton.addEventListener("click", () => {
+        shiftButton.addEventListener("pointerdown", () => {
+            triggerPressAnimation(shiftButton);
             playSoundTombol();
             if (currentBoardMode === 1) {
                 currentBoardMode = 2;
@@ -352,7 +356,8 @@
             renderBoard();
         });
 
-        document.getElementById("confirmButton").addEventListener("click", () => {
+        document.getElementById("confirmButton").addEventListener("pointerdown", (e) => {
+            triggerPressAnimation(e.target);
             const inputUser = jawaWordEl.textContent.trim();
             const kunciJawaban = currentJawa.trim();
 
@@ -371,7 +376,8 @@
             }
         });
 
-        document.getElementById("deleteButton").addEventListener("click", () => {
+        document.getElementById("deleteButton").addEventListener("pointerdown", (e) => {
+            triggerPressAnimation(e.target);
             let text = jawaWordEl.textContent;
             if (text.length > 0) {
                 jawaWordEl.textContent = Array.from(text).slice(0, -1).join('');

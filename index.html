@@ -502,7 +502,7 @@
         // FUNGSI UNTUK MENGIRIM DATA KE GOOGLE SHEETS
 // FUNGSI UNTUK MENGIRIM DATA KE GOOGLE SHEETS VIA FORM HIDDEN (BEBAS ERROR 404/405)
 function sendDataToGoogleSheet(finalScore, gameStatus, statusElementId) {
-    if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL === "https://script.google.com/macros/s/AKfycbw4fxqwmkduaoFBK-pG0snTgSMdy0eHdQ57FgwJL-Mtir6xdhGZ8M2Vof2kPz6lMF6G/exec") {
+    if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL === "https://script.google.com/macros/s/AKfycbx59r8wfRSnqthH9ekg8cegais_XLLCykHplJVvrX9ElV1Ym5SB35h0HxPGPyjz68UQIA/exec") {
         document.getElementById(statusElementId).textContent = "(Data belum terhubung ke Google Sheet)";
         return;
     }

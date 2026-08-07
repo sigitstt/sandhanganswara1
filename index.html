@@ -71,7 +71,7 @@
             border-radius: 8px;
             font-size: 16px;
             cursor: pointer;
-            transition: transform 0.1s;
+            transition: transform 0.7s;
             touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
@@ -124,7 +124,7 @@
     <h2>(Sandhangan & Pasangan)</h2>
 
     <div class="info" id="gameInfo">
-        <span id="time">Wektu: 30 s</span> | <span id="lives">Nyawa: 3</span> | <span id="score">Skor: 0</span>
+        <span id="time">Wektu: 300 s</span> | <span id="lives">Nyawa: 3</span> | <span id="score">Skor: 0</span>
     </div>
 
     <div class="output">Tulisan Latin :</div>
@@ -160,7 +160,7 @@
             const gain = audioCtx.createGain();
             osc.type = 'sine';
             osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-            gain.gain.setValueAtTime(0.6, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.9, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
             osc.connect(gain);
             gain.connect(audioCtx.destination);
@@ -175,7 +175,7 @@
             const gain = audioCtx.createGain();
             osc.type = 'triangle';
             osc.frequency.setValueAtTime(300, audioCtx.currentTime);
-            gain.gain.setValueAtTime(0.7, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.9, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
             osc.connect(gain);
             gain.connect(audioCtx.destination);
@@ -191,7 +191,7 @@
             osc.type = 'sine';
             osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); 
             osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); 
-            gain.gain.setValueAtTime(0.7, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.9, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
             osc.connect(gain);
             gain.connect(audioCtx.destination);
@@ -206,7 +206,7 @@
             const gain = audioCtx.createGain();
             osc.type = 'sawtooth';
             osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-            gain.gain.setValueAtTime(0.6, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.9, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
             osc.connect(gain);
             gain.connect(audioCtx.destination);
@@ -222,7 +222,7 @@
             osc.type = 'sawtooth';
             osc.frequency.setValueAtTime(200, audioCtx.currentTime);
             osc.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.6);
-            gain.gain.setValueAtTime(0.8, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.9, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
             osc.connect(gain);
             gain.connect(audioCtx.destination);
@@ -239,7 +239,7 @@
                 const gain = audioCtx.createGain();
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(freq, audioCtx.currentTime + (index * 0.1));
-                gain.gain.setValueAtTime(0.7, audioCtx.currentTime + (index * 0.1));
+                gain.gain.setValueAtTime(0.9, audioCtx.currentTime + (index * 0.1));
                 gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + (index * 0.1) + 0.2);
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
@@ -292,7 +292,7 @@
         let currentBoardMode = 1; // 1 = Primary, 2 = Secondary
         let currentLatin = "";
         let currentJawa = "";
-        let timeLeft = 30;
+        let timeLeft = 300;
         let score = 0;
         let lives = 3;
         let timer = null;

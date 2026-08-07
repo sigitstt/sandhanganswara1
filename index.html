@@ -500,37 +500,39 @@
         }
 
         // FUNGSI UNTUK MENGIRIM DATA KE GOOGLE SHEETS
-        function sendDataToGoogleSheet(finalScore, gameStatus, statusElementId) {
-            if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL === "https://script.google.com/macros/s/AKfycbxi7arM3GQGeE-q3hzx5TDLKl8J_COx1Smlugd8oImD1JoV66MAdw1T2MrpMTNX1oVt/exec") {
-                console.log("URL Google Apps Script belum diisi.");
-                document.getElementById(statusElementId).textContent = "(Data belum terhubung ke Google Sheet)";
-                return;
-            }
+function sendDataToGoogleSheet(finalScore, gameStatus, statusElementId) {
+    if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL === "https://script.google.com/macros/s/AKfycbxi7arM3GQGeE-q3hzx5TDLKl8J_COx1Smlugd8oImD1JoV66MAdw1T2MrpMTNX1oVt/exec") {
+        console.log("URL Google Apps Script belum diisi.");
+        document.getElementById(statusElementId).textContent = "(Data belum terhubung ke Google Sheet)";
+        return;
+    }
 
-            const payload = {
-                absen: absenSiswa,
-                nama: namaSiswa,
-                kelas: kelasSiswa,
-                skor: finalScore,
-                status: gameStatus
-            };
+    const payload = JSON.stringify({
+        absen: absenSiswa,
+        nama: namaSiswa,
+        kelas: kelasSiswa,
+        skor: finalScore,
+        status: gameStatus
+    });
 
-            fetch(GOOGLE_SCRIPT_URL, {
-                method: "POST",
-                mode: "no-cors",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(payload)
-            })
-            .then(() => {
-                document.getElementById(statusElementId).textContent = "✓ Data berhasil disimpan ke Google Sheet!";
-            })
-            .catch(error => {
-                console.error("Error sending data: ", error);
-                document.getElementById(statusElementId).textContent = "× Gagal mengirim data ke Google Sheet.";
-            });
-        }
+    // Menggunakan fetch dengan mode no-cors dan redirect follow
+    fetch(GOOGLE_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        redirect: "follow",
+        headers: {
+            "Content-Type": "text/plain;charset=utf-8" // Menggunakan text/plain mencegah Preflight CORS Error
+        },
+        body: payload
+    })
+    .then(() => {
+        document.getElementById(statusElementId).textContent = "✓ Data berhasil disimpan ke Google Sheet!";
+    })
+    .catch(error => {
+        console.error("Error sending data: ", error);
+        document.getElementById(statusElementId).textContent = "× Gagal mengirim data ke Google Sheet.";
+    });
+}
 
         function gameOver() {
             clearInterval(timer);

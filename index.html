@@ -28,7 +28,7 @@
         /* Tampilan Form Identitas Siswa */
         .start-screen {
             max-width: 350px;
-            margin: 50px auto;
+            margin: 40px auto;
             padding: 25px;
             background-color: #ffffff;
             border-radius: 12px;
@@ -71,7 +71,6 @@
             user-select: none;
         }
 
-        /* Container Utama Game (Awalnya tersembunyi) */
         .game-container {
             display: none;
         }
@@ -165,22 +164,33 @@
             min-height: 50px;
             font-family: 'Noto Sans Javanese', 'nyk Ngayogyan New', sans-serif;
         }
+
+        .sending-status {
+            font-size: 14px;
+            color: #555;
+            margin-top: 10px;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
 
-    <!-- HALAMAN AWAL (FORM INPUT IDENTITAS) -->
+    <!-- HALAMAN AWAL (FORM IDENTITAS) -->
     <div class="start-screen" id="startScreen">
         <h1>Game Nulis Jawa</h1>
         <h2>Isi Identitas</h2>
         <form id="studentForm">
             <div class="form-group">
-                <label for="studentName">Nama Lengkap:</label>
+                <label for="studentAbsen">1. Nomor Absen:</label>
+                <input type="number" id="studentAbsen" placeholder="Masukkan nomor..." required>
+            </div>
+            <div class="form-group">
+                <label for="studentName">2. Nama Lengkap:</label>
                 <input type="text" id="studentName" placeholder="Masukkan nama..." required>
             </div>
             <div class="form-group">
-                <label for="studentAbsen">Nomor Absen:</label>
-                <input type="number" id="studentAbsen" placeholder="Masukkan nomor..." required>
+                <label for="studentKelas">3. Kelas:</label>
+                <input type="text" id="studentKelas" placeholder="Contoh: 7A / 8B..." required>
             </div>
             <button type="button" class="btn-start" id="startBtn">MULAI MAIN</button>
         </form>
@@ -210,6 +220,9 @@
     </div>
 
     <script>
+        // === TEMPELKAN URL APPS SCRIPT ANDA DI SINI ===
+        const GOOGLE_SCRIPT_URL = "PASTE_URL_GOOGLE_APPS_SCRIPT_DI_SINI";
+
         // --- WEB AUDIO API ---
         let audioCtx = null;
 
@@ -327,6 +340,7 @@
         // --- DATA SOAL & IDENTITAS ---
         let namaSiswa = "";
         let absenSiswa = "";
+        let kelasSiswa = "";
 
         const latinWords = [
             "NANDUR", "MANGAN SATE", "BAPAK TUKU", "IKI", "IKU", "IDU", "IGA", "IBU", "INGU", "URA", "ULA", 
@@ -369,7 +383,7 @@
         let currentBoardMode = 1; 
         let currentLatin = "";
         let currentJawa = "";
-        let timeLeft = 50;
+        let timeLeft = 30;
         let score = 0;
         let lives = 3;
         let timer = null;
@@ -390,16 +404,18 @@
         // PROSES FORM IDENTITAS & MULAI GAME
         startBtn.addEventListener("pointerdown", (e) => {
             triggerPressAnimation(e.target);
-            const inputName = document.getElementById("studentName").value.trim();
             const inputAbsen = document.getElementById("studentAbsen").value.trim();
+            const inputName = document.getElementById("studentName").value.trim();
+            const inputKelas = document.getElementById("studentKelas").value.trim();
 
-            if (inputName === "" || inputAbsen === "") {
-                alert("Nyuwun sewu, isi Nama lan Nomor Absen rumiyin!");
+            if (inputAbsen === "" || inputName === "" || inputKelas === "") {
+                alert("Nyuwun sewu, isi No Absen, Nama, lan Kelas rumiyin!");
                 return;
             }
 
-            namaSiswa = inputName;
             absenSiswa = inputAbsen;
+            namaSiswa = inputName;
+            kelasSiswa = inputKelas;
 
             startScreen.style.display = "none";
             gameContainer.style.display = "block";
@@ -493,9 +509,43 @@
             }, 1000);
         }
 
+        // FUNGSI UNTUK MENGIRIM DATA KE GOOGLE SHEETS
+        function sendDataToGoogleSheet(finalScore, gameStatus, statusElementId) {
+            if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL === "https://script.google.com/macros/s/AKfycbyE-k8UPgBM8D_1DocOgVIRT_WrgHKnRZvji3_96c2NHeB--oXOaqRvK0Tro2ICW_jW/exec") {
+                console.log("URL Google Apps Script belum diisi.");
+                document.getElementById(statusElementId).textContent = "(Data belum terhubung ke Google Sheet)";
+                return;
+            }
+
+            const payload = {
+                absen: absenSiswa,
+                nama: namaSiswa,
+                kelas: kelasSiswa,
+                skor: finalScore,
+                status: gameStatus
+            };
+
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(() => {
+                document.getElementById(statusElementId).textContent = "✓ Data berhasil disimpan ke Google Sheet!";
+            })
+            .catch(error => {
+                console.error("Error sending data: ", error);
+                document.getElementById(statusElementId).textContent = "× Gagal mengirim data ke Google Sheet.";
+            });
+        }
+
         function gameOver() {
             clearInterval(timer);
             gameContainer.style.display = "none";
+            const finalScore = ((score / totalQuestions) * 100).toFixed(1);
 
             const gameOverMessage = document.createElement("div");
             gameOverMessage.style.position = "fixed";
@@ -511,20 +561,25 @@
             gameOverMessage.innerHTML = `
                 <h1 style="margin-top:0;">Game Over</h1>
                 <hr>
-                <p style="font-size: 18px; margin: 10px 0;"><strong>Nama:</strong> ${namaSiswa}</p>
-                <p style="font-size: 18px; margin: 10px 0;"><strong>No. Absen:</strong> ${absenSiswa}</p>
+                <p style="font-size: 18px; margin: 8px 0;"><strong>No. Absen:</strong> ${absenSiswa}</p>
+                <p style="font-size: 18px; margin: 8px 0;"><strong>Nama:</strong> ${namaSiswa}</p>
+                <p style="font-size: 18px; margin: 8px 0;"><strong>Kelas:</strong> ${kelasSiswa}</p>
                 <h2>Skor Anda:</h2>
-                <h1 style="font-size: 48px; color: #A00101; margin: 10px 0;">${((score / totalQuestions) * 100).toFixed(1)}</h1>
-                <p>Sabar nggih... kanggo main maneh</p>
+                <h1 style="font-size: 48px; color: #A00101; margin: 10px 0;">${finalScore}</h1>
+                <div class="sending-status" id="sendStatus">Menyimpan nilai ke Google Sheet...</div>
+                <p style="margin-top:15px;">Sabar nggih... kanggo main maneh</p>
                 <h3>Refresh halaman!</h3>
             `;
             playSoundGameOver();
             document.body.appendChild(gameOverMessage);
+
+            sendDataToGoogleSheet(finalScore, "Game Over", "sendStatus");
         }
 
         function gameFinish() {
             clearInterval(timer);
             gameContainer.style.display = "none";
+            const finalScore = ((score / totalQuestions) * 100).toFixed(1);
 
             const gameFinishMessage = document.createElement("div");
             gameFinishMessage.style.position = "fixed";
@@ -540,15 +595,19 @@
             gameFinishMessage.innerHTML = `
                 <h1 style="margin-top:0;">Game Finish</h1>
                 <hr>
-                <p style="font-size: 18px; margin: 10px 0;"><strong>Nama:</strong> ${namaSiswa}</p>
-                <p style="font-size: 18px; margin: 10px 0;"><strong>No. Absen:</strong> ${absenSiswa}</p>
+                <p style="font-size: 18px; margin: 8px 0;"><strong>No. Absen:</strong> ${absenSiswa}</p>
+                <p style="font-size: 18px; margin: 8px 0;"><strong>Nama:</strong> ${namaSiswa}</p>
+                <p style="font-size: 18px; margin: 8px 0;"><strong>Kelas:</strong> ${kelasSiswa}</p>
                 <h2>Skor Anda:</h2>
-                <h1 style="font-size: 48px; color: #055205; margin: 10px 0;">${((score / totalQuestions) * 100).toFixed(1)}</h1>
-                <p>Alhamdulillah... kanggo main maneh</p>
+                <h1 style="font-size: 48px; color: #055205; margin: 10px 0;">${finalScore}</h1>
+                <div class="sending-status" id="sendStatus">Menyimpan nilai ke Google Sheet...</div>
+                <p style="margin-top:15px;">Alhamdulillah... kanggo main maneh</p>
                 <h3>Refresh halaman!</h3>
             `;
             playSoundFinish();
             document.body.appendChild(gameFinishMessage);
+
+            sendDataToGoogleSheet(finalScore, "Finish", "sendStatus");
         }
     </script>
 </body>

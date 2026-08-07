@@ -501,7 +501,7 @@
 
         // FUNGSI UNTUK MENGIRIM DATA KE GOOGLE SHEETS
         function sendDataToGoogleSheet(finalScore, gameStatus, statusElementId) {
-            if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL === "https://script.google.com/macros/s/AKfycbxjDn7aVicO-L_aYl3AdnZ7SY4dLN4AMIlwPKOoDQet0cXs6TYs3aZd8wCls6l8tQ0/exec") {
+            if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL === "https://script.google.com/macros/s/AKfycbxi7arM3GQGeE-q3hzx5TDLKl8J_COx1Smlugd8oImD1JoV66MAdw1T2MrpMTNX1oVt/exec") {
                 console.log("URL Google Apps Script belum diisi.");
                 document.getElementById(statusElementId).textContent = "(Data belum terhubung ke Google Sheet)";
                 return;

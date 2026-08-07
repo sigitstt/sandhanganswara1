@@ -343,21 +343,11 @@
         let kelasSiswa = "";
 
         const latinWords = [
-            "NANDUR", "MANGAN SATE", "BAPAK TUKU", "IKI", "IKU", "IDU", "IGA", "IBU", "INGU", "URA", "ULA", 
-            "ULI", "UPA", "UJA", "UJI", "UGA", "UGI", "ECA", "EKA", "EWA", "EKO", "ORA", "ORI",
-            "EDI", "NIKI", "NITI", "NIRA", "NIKA", "NIBA", "NUHONI", "NURI", "NURU", "NUTU",
-            "NUSA", "NEDHA", "NEKA", "NELA", "NERAKA", "CIRI", "CINA", "CELANA", "CETHA", "RAHINA",
-            "RADI", "RINA", "RIKA", "RIYAYA", "RUPA", "RENA", "RECA", "REKA", "REGA", "REGI",
-            "REGU", "REMA", "REJA", "KADI", "KALI", "KAPI", "KAJI", "KINA", "KIRA", "KUNA"
+            "NANDUR", "MANGAN SATE", "BAPAK TUKU"
         ];
 
         const jawaWords = [
-            "ꦤꦤ꧀ꦢꦸꦂ", "ꦩꦔꦤ꧀ꦱꦠꦺ", "ꦧꦥꦏ꧀ꦠꦸꦏꦸ", "ꦲꦶꦏꦶ", "ꦲꦶꦏꦸ", "ꦲꦶꦢꦸ", "ꦲꦶꦒ", "ꦲꦶꦧꦸ", "ꦲꦶꦔꦸ", "ꦲꦸꦫ", "ꦲꦸꦭ", 
-            "ꦲꦸꦭꦶ", "ꦲꦸꦥ", "ꦲꦸꦗ", "ꦲꦸꦗꦶ", "ꦲꦸꦒ", "ꦲꦸꦒꦶ", "ꦲꦺꦕ", "ꦲꦺꦏ", "ꦲꦺꦮ", "ꦲꦺꦏꦺꦴ", "ꦲꦺꦴꦫ", "ꦲꦺꦴꦫꦶ",
-            "ꦲꦺꦢꦶ", "ꦤꦶꦏꦶ", "ꦤꦶꦠꦶ", "ꦤꦶꦫ", "ꦤꦶꦏ", "ꦤꦶꦧ", "ꦤꦸꦲꦺꦴꦤꦶ", "ꦤꦸꦫꦶ", "ꦤꦸꦫꦸ", "ꦤꦸꦠꦸ",
-            "ꦤꦸꦱ", "ꦤꦼꦣ", "ꦤꦺꦏ", "ꦤꦼꦭ", "ꦤꦼꦫꦏ", "ꦕꦶꦫꦶ", "ꦕꦶꦤ", "ꦕꦼꦭꦤ", "ꦕꦼꦛ", "ꦫꦲꦶꦤ",
-            "ꦫꦢꦶ", "ꦫꦶꦤ", "ꦫꦶꦏ", "ꦫꦶꦪꪪ", "ꦫꦸꦥ", "ꦉꦤ", "ꦉꦕ", "ꦫꦺꦏ", "ꦉꦒ", "ꦉꦒꦶ",
-            "ꦉꦒꦸ", "ꦫꦺꦩ", "ꦉꦗ", "ꦏꦢꦶ", "ꦏꦭꦶ", "ꦏꦥꦶ", "ꦏꦗꦶ", "ꦏꦶꦤ", "ꦏꦶꦫ", "ꦏꦸꦤ"
+            "ꦤꦤ꧀ꦢꦸꦂ", "ꦩꦔꦤ꧀ꦱꦠꦺ", "ꦧꦥꦏ꧀ꦠꦸꦏꦸ"
         ];
 
         const jawaLettersPrimary = [
@@ -511,7 +501,7 @@
 
         // FUNGSI UNTUK MENGIRIM DATA KE GOOGLE SHEETS
         function sendDataToGoogleSheet(finalScore, gameStatus, statusElementId) {
-            if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL === "https://script.google.com/macros/s/AKfycbyE-k8UPgBM8D_1DocOgVIRT_WrgHKnRZvji3_96c2NHeB--oXOaqRvK0Tro2ICW_jW/exec") {
+            if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL === "https://script.google.com/macros/s/AKfycbxjDn7aVicO-L_aYl3AdnZ7SY4dLN4AMIlwPKOoDQet0cXs6TYs3aZd8wCls6l8tQ0/exec") {
                 console.log("URL Google Apps Script belum diisi.");
                 document.getElementById(statusElementId).textContent = "(Data belum terhubung ke Google Sheet)";
                 return;

@@ -59,12 +59,12 @@
         .controls {
             display: flex;
             justify-content: center;
-            gap: 20px;
+            gap: 15px;
             margin-top: 20px;
         }
 
         .control-button {
-            padding: 10px 20px;
+            padding: 10px 18px;
             background-color: #055205;
             border: 2px solid #333;
             color: white;
@@ -75,6 +75,10 @@
             touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
+        }
+
+        .control-button.shift {
+            background-color: #0056b3;
         }
 
         .control-button.delete {
@@ -131,12 +135,13 @@
     <div class="game-board" id="jawaBoard"></div>
 
     <div class="controls">
+        <button class="control-button shift" id="shiftButton">SHIFT 2</button>
         <button class="control-button delete" id="deleteButton">GOSOK</button>
         <button class="control-button confirm" id="confirmButton">KIRIM</button>   
     </div>
 
     <script>
-        // --- WEB AUDIO API (Suara Langsung Tanpa File MP3 & Bebas Delay) ---
+        // --- WEB AUDIO API (Suara Keras & Bebas Delay) ---
         let audioCtx = null;
 
         function initAudio() {
@@ -148,15 +153,14 @@
             }
         }
 
-        // Suara Ketukan Tombol Aksara (Beep Pendek Ringan)
         function playSoundTombol() {
             initAudio();
             if (!audioCtx) return;
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.type = 'sine';
-            osc.frequency.setValueAtTime(600, audioCtx.currentTime); // Frekuensi 600Hz
-            gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+            osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.6, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
             osc.connect(gain);
             gain.connect(audioCtx.destination);
@@ -164,7 +168,6 @@
             osc.stop(audioCtx.currentTime + 0.05);
         }
 
-        // Suara Tombol Hapus / Gosok
         function playSoundHapus() {
             initAudio();
             if (!audioCtx) return;
@@ -172,7 +175,7 @@
             const gain = audioCtx.createGain();
             osc.type = 'triangle';
             osc.frequency.setValueAtTime(300, audioCtx.currentTime);
-            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.7, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
             osc.connect(gain);
             gain.connect(audioCtx.destination);
@@ -180,16 +183,15 @@
             osc.stop(audioCtx.currentTime + 0.08);
         }
 
-        // Suara Jawaban Benar (Nada Nada Tinggi / Ting!)
         function playSoundBenar() {
             initAudio();
             if (!audioCtx) return;
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.type = 'sine';
-            osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // Tone C5
-            osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // Tone E5
-            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); 
+            osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); 
+            gain.gain.setValueAtTime(0.7, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
             osc.connect(gain);
             gain.connect(audioCtx.destination);
@@ -197,7 +199,6 @@
             osc.stop(audioCtx.currentTime + 0.3);
         }
 
-        // Suara Jawaban Salah (Nada Rendah / Tet!)
         function playSoundSalah() {
             initAudio();
             if (!audioCtx) return;
@@ -205,7 +206,7 @@
             const gain = audioCtx.createGain();
             osc.type = 'sawtooth';
             osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.6, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
             osc.connect(gain);
             gain.connect(audioCtx.destination);
@@ -213,7 +214,6 @@
             osc.stop(audioCtx.currentTime + 0.25);
         }
 
-        // Suara Game Over
         function playSoundGameOver() {
             initAudio();
             if (!audioCtx) return;
@@ -222,7 +222,7 @@
             osc.type = 'sawtooth';
             osc.frequency.setValueAtTime(200, audioCtx.currentTime);
             osc.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.6);
-            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.8, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
             osc.connect(gain);
             gain.connect(audioCtx.destination);
@@ -230,17 +230,16 @@
             osc.stop(audioCtx.currentTime + 0.6);
         }
 
-        // Suara Game Finish
         function playSoundFinish() {
             initAudio();
             if (!audioCtx) return;
-            const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+            const notes = [523.25, 659.25, 783.99, 1046.50];
             notes.forEach((freq, index) => {
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(freq, audioCtx.currentTime + (index * 0.1));
-                gain.gain.setValueAtTime(0.2, audioCtx.currentTime + (index * 0.1));
+                gain.gain.setValueAtTime(0.7, audioCtx.currentTime + (index * 0.1));
                 gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + (index * 0.1) + 0.2);
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
@@ -268,13 +267,29 @@
             "ꦉꦒꦸ", "ꦫꦺꦩ", "ꦉꦗ", "ꦏꦢꦶ", "ꦏꦭꦶ", "ꦏꦥꦶ", "ꦏꦗꦶ", "ꦏꦶꦤ", "ꦏꦶꦫ", "ꦏꦸꦤ"
         ];
 
-        const jawaLetters = [
-            "ꦲ", "ꦤ", "ꦕ", "ꦫ", "ꦏ", "ꦢ", "ꦠ", "ꦱ", "ꦮ", "ꦭ", 
-            "ꦥ", "ꦣ", "ꦗ", "ꦪ", "ꦚ", "ꦩ", "ꦒ", "ꦧ", "ꦛ", "ꦔ", 
-            "ꦶ", "ꦸ", "ꦺ", "ꦺꦴ", "ꦼ", "ꦉ", "ꦊ", "ꦂ", "ꦁ", "ꦃ", 
+        // PAPAN TOMBOL UTAMA (35 Tombol)
+        const jawaLettersPrimary = [
+            "ꦲ", "ꦤ", "ꦕ", "ꦫ", "ꦏ", 
+            "ꦢ", "ꦠ", "ꦱ", "ꦮ", "ꦭ", 
+            "ꦥ", "ꦣ", "ꦗ", "ꦪ", "ꦚ", 
+            "ꦩ", "ꦒ", "ꦧ", "ꦛ", "ꦔ", 
+            "ꦶ", "ꦸ", "ꦺ", "ꦺꦴ", "ꦼ", 
+            "ꦉ", "ꦊ", "ꦂ", "ꦁ", "ꦃ", 
             "ꦿ", "ꦽ", "ꦾ", "꧇", "꧀"
         ];
 
+        // PAPAN TOMBOL KEDUA (35 Tombol: Murda, Swara, Mahaprana & Tanda Baca)
+        const jawaLettersSecondary = [
+            "ꦟ", "ꦑ", "ꦠ꦳", "ꦯ", "ꦦ", // Na, Ka, Ta, Sa, Pa Murda
+            "ꦙ", "ꦓ", "ꦨ", "ꦯ꦳", "ꦖ", // Ja, Ga, Ba Murda, Kh, Ch
+            "ꦄ", "ꦆ", "ꦈ", "ꦌ", "ꦎ", // Swara: A, I, U, E, O
+            "ꦑ꦳", "ꦥ꦳", "ꦥ꦳꦳", "ꦗ꦳", "ꦒ꦳", // Rekan: Kh, Fa, Va, Za, Gh
+            "꧈", "꧉", "꧊", "꧋", "꧌", // Pada Lingsa, Lungsi, Pangkat, dll
+            "꧍", "ꧏ", "꧐", "꧑", "꧒", // Pada Andap, Munggang, Angka 0, 1, 2
+            "꧓", "꧔", "꧕", "꧖", "꧗"  // Angka 3, 4, 5, 6, 7
+        ];
+
+        let currentBoardMode = 1; // 1 = Primary, 2 = Secondary
         let currentLatin = "";
         let currentJawa = "";
         let timeLeft = 30;
@@ -289,6 +304,7 @@
         const scoreEl = document.getElementById("score");
         const livesEl = document.getElementById("lives");
         const jawaBoard = document.getElementById("jawaBoard");
+        const shiftButton = document.getElementById("shiftButton");
 
         function chooseNewWord() {
             if (latinWords.length === 0) {
@@ -303,21 +319,36 @@
             jawaWordEl.textContent = "";
         }
 
-        function createJawaBoard() {
+        function renderBoard() {
             jawaBoard.innerHTML = "";
-            jawaLetters.forEach(letter => {
+            const activeLetters = (currentBoardMode === 1) ? jawaLettersPrimary : jawaLettersSecondary;
+            
+            activeLetters.forEach(letter => {
                 const button = document.createElement("div");
                 button.className = "button";
                 button.textContent = letter;
                 
                 button.addEventListener("click", () => {
                     jawaWordEl.textContent += letter;
-                    playSoundTombol(); // Suara instan
+                    playSoundTombol();
                 });
                 
                 jawaBoard.appendChild(button);
             });
         }
+
+        // TOGGLE TOMBOL SHIFT (Pindah Antara Papan 1 & Papan 2)
+        shiftButton.addEventListener("click", () => {
+            playSoundTombol();
+            if (currentBoardMode === 1) {
+                currentBoardMode = 2;
+                shiftButton.textContent = "SHIFT 1";
+            } else {
+                currentBoardMode = 1;
+                shiftButton.textContent = "SHIFT 2";
+            }
+            renderBoard();
+        });
 
         document.getElementById("confirmButton").addEventListener("click", () => {
             const inputUser = jawaWordEl.textContent.trim();
@@ -348,7 +379,7 @@
 
         function startGame() {
             chooseNewWord();
-            createJawaBoard();
+            renderBoard();
             timer = setInterval(() => {
                 timeLeft--;
                 timeEl.textContent = `Wektu: ${timeLeft} s`;

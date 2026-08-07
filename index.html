@@ -52,8 +52,10 @@
             user-select: none;
         }
 
-        .button:active {
+/* Kelas baru untuk efek turun instan saat diketik cepat */
+        .button.pressed, .control-button.pressed, .button:active, .control-button:active {
             transform: translateY(5px);
+            background-color: #e6e5a0; /* Sedikit menggelap agar efek ketikan lebih terasa */
         }
 
         .controls {

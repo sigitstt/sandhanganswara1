@@ -25,6 +25,57 @@
             color: #333;
         }
 
+        /* Tampilan Form Identitas Siswa */
+        .start-screen {
+            max-width: 350px;
+            margin: 50px auto;
+            padding: 25px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            border: 2px solid #333;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        .btn-start {
+            width: 100%;
+            padding: 12px;
+            background-color: #055205;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.05s ease-out;
+            user-select: none;
+        }
+
+        /* Container Utama Game (Awalnya tersembunyi) */
+        .game-container {
+            display: none;
+        }
+
         .game-board {
             display: grid;
             grid-template-columns: repeat(5, 60px);
@@ -46,16 +97,15 @@
             color: #333;
             cursor: pointer;
             border-radius: 8px;
-            transition: transform 0.05s ease-out; /* Transisi dipercepat */
+            transition: transform 0.05s ease-out;
             touch-action: manipulation;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
         }
 
-        /* Kelas baru untuk efek turun instan saat diketik cepat */
-        .button.pressed, .control-button.pressed, .button:active, .control-button:active {
+        .button.pressed, .control-button.pressed, .btn-start.pressed, .button:active, .control-button:active {
             transform: translateY(5px);
-            background-color: #e6e5a0; /* Sedikit menggelap agar efek ketikan lebih terasa */
+            background-color: #e6e5a0;
         }
 
         .controls {
@@ -118,28 +168,49 @@
     </style>
 </head>
 <body>
-    <h1>Game Nulis Jawa</h1>
-    <h2>(Sandhangan & Pasangan)</h2>
 
-    <div class="info" id="gameInfo">
-        <span id="time">Wektu: 30 s</span> | <span id="lives">Nyawa: 3</span> | <span id="score">Skor: 0</span>
+    <!-- HALAMAN AWAL (FORM INPUT IDENTITAS) -->
+    <div class="start-screen" id="startScreen">
+        <h1>Game Nulis Jawa</h1>
+        <h2>Isi Identitas</h2>
+        <form id="studentForm">
+            <div class="form-group">
+                <label for="studentName">Nama Lengkap:</label>
+                <input type="text" id="studentName" placeholder="Masukkan nama..." required>
+            </div>
+            <div class="form-group">
+                <label for="studentAbsen">Nomor Absen:</label>
+                <input type="number" id="studentAbsen" placeholder="Masukkan nomor..." required>
+            </div>
+            <button type="button" class="btn-start" id="startBtn">MULAI MAIN</button>
+        </form>
     </div>
 
-    <div class="output">Tulisan Latin :</div>
-    <div class="output1" id="latinWord">-</div>
-    <div class="output">Tulisan Jawa :</div>
-    <div class="output2" id="jawaWord"></div>
+    <!-- HALAMAN PERMAINAN -->
+    <div class="game-container" id="gameContainer">
+        <h1>Game Nulis Jawa</h1>
+        <h2>(Sandhangan & Pasangan)</h2>
 
-    <div class="game-board" id="jawaBoard"></div>
+        <div class="info" id="gameInfo">
+            <span id="time">Wektu: 30 s</span> | <span id="lives">Nyawa: 3</span> | <span id="score">Skor: 0</span>
+        </div>
 
-    <div class="controls">
-        <button class="control-button shift" id="shiftButton">SHIFT 2</button>
-        <button class="control-button delete" id="deleteButton">GOSOK</button>
-        <button class="control-button confirm" id="confirmButton">KIRIM</button>   
+        <div class="output">Tulisan Latin :</div>
+        <div class="output1" id="latinWord">-</div>
+        <div class="output">Tulisan Jawa :</div>
+        <div class="output2" id="jawaWord"></div>
+
+        <div class="game-board" id="jawaBoard"></div>
+
+        <div class="controls">
+            <button class="control-button shift" id="shiftButton">SHIFT 2</button>
+            <button class="control-button delete" id="deleteButton">GOSOK</button>
+            <button class="control-button confirm" id="confirmButton">KIRIM</button>   
+        </div>
     </div>
 
     <script>
-        // --- WEB AUDIO API (Suara Keras & Bebas Delay) ---
+        // --- WEB AUDIO API ---
         let audioCtx = null;
 
         function initAudio() {
@@ -246,15 +317,17 @@
             });
         }
 
-        // FUNGSI KHUSUS EFEK TEKANAN INSTAN DI HP
         function triggerPressAnimation(element) {
             element.classList.add("pressed");
             setTimeout(() => {
                 element.classList.remove("pressed");
-            }, 100); // Tombol akan tampak tertekan selama 100 milidetik
+            }, 100);
         }
 
-        // --- DAFTAR SOAL DAN KUNCI JAWABAN ---
+        // --- DATA SOAL & IDENTITAS ---
+        let namaSiswa = "";
+        let absenSiswa = "";
+
         const latinWords = [
             "NANDUR", "MANGAN SATE", "BAPAK TUKU", "IKI", "IKU", "IDU", "IGA", "IBU", "INGU", "URA", "ULA", 
             "ULI", "UPA", "UJA", "UJI", "UGA", "UGI", "ECA", "EKA", "EWA", "EKO", "ORA", "ORI",
@@ -269,7 +342,7 @@
             "ꦲꦸꦭꦶ", "ꦲꦸꦥ", "ꦲꦸꦗ", "ꦲꦸꦗꦶ", "ꦲꦸꦒ", "ꦲꦸꦒꦶ", "ꦲꦺꦕ", "ꦲꦺꦏ", "ꦲꦺꦮ", "ꦲꦺꦏꦺꦴ", "ꦲꦺꦴꦫ", "ꦲꦺꦴꦫꦶ",
             "ꦲꦺꦢꦶ", "ꦤꦶꦏꦶ", "ꦤꦶꦠꦶ", "ꦤꦶꦫ", "ꦤꦶꦏ", "ꦤꦶꦧ", "ꦤꦸꦲꦺꦴꦤꦶ", "ꦤꦸꦫꦶ", "ꦤꦸꦫꦸ", "ꦤꦸꦠꦸ",
             "ꦤꦸꦱ", "ꦤꦼꦣ", "ꦤꦺꦏ", "ꦤꦼꦭ", "ꦤꦼꦫꦏ", "ꦕꦶꦫꦶ", "ꦕꦶꦤ", "ꦕꦼꦭꦤ", "ꦕꦼꦛ", "ꦫꦲꦶꦤ",
-            "ꦫꦢꦶ", "ꦫꦶꦤ", "ꦫꦶꦏ", "ꦫꦶꦪꦪ", "ꦫꦸꦥ", "ꦉꦤ", "ꦉꦕ", "ꦫꦺꦏ", "ꦉꦒ", "ꦉꦒꦶ",
+            "ꦫꦢꦶ", "ꦫꦶꦤ", "ꦫꦶꦏ", "ꦫꦶꦪꪪ", "ꦫꦸꦥ", "ꦉꦤ", "ꦉꦕ", "ꦫꦺꦏ", "ꦉꦒ", "ꦉꦒꦶ",
             "ꦉꦒꦸ", "ꦫꦺꦩ", "ꦉꦗ", "ꦏꦢꦶ", "ꦏꦭꦶ", "ꦏꦥꦶ", "ꦏꦗꦶ", "ꦏꦶꦤ", "ꦏꦶꦫ", "ꦏꦸꦤ"
         ];
 
@@ -302,6 +375,10 @@
         let timer = null;
         let totalQuestions = latinWords.length;
 
+        const startScreen = document.getElementById("startScreen");
+        const gameContainer = document.getElementById("gameContainer");
+        const startBtn = document.getElementById("startBtn");
+
         const latinWordEl = document.getElementById("latinWord");
         const jawaWordEl = document.getElementById("jawaWord");
         const timeEl = document.getElementById("time");
@@ -309,6 +386,26 @@
         const livesEl = document.getElementById("lives");
         const jawaBoard = document.getElementById("jawaBoard");
         const shiftButton = document.getElementById("shiftButton");
+
+        // PROSES FORM IDENTITAS & MULAI GAME
+        startBtn.addEventListener("pointerdown", (e) => {
+            triggerPressAnimation(e.target);
+            const inputName = document.getElementById("studentName").value.trim();
+            const inputAbsen = document.getElementById("studentAbsen").value.trim();
+
+            if (inputName === "" || inputAbsen === "") {
+                alert("Nyuwun sewu, isi Nama lan Nomor Absen rumiyin!");
+                return;
+            }
+
+            namaSiswa = inputName;
+            absenSiswa = inputAbsen;
+
+            startScreen.style.display = "none";
+            gameContainer.style.display = "block";
+            
+            startGame();
+        });
 
         function chooseNewWord() {
             if (latinWords.length === 0) {
@@ -332,7 +429,6 @@
                 button.className = "button";
                 button.textContent = letter;
                 
-                // Memicu efek tombol turun saat jari PERTAMA KALI menyentuh (pointerdown)
                 button.addEventListener("pointerdown", () => {
                     triggerPressAnimation(button);
                     jawaWordEl.textContent += letter;
@@ -399,25 +495,28 @@
 
         function gameOver() {
             clearInterval(timer);
-            const gameElements = document.querySelectorAll("#gameInfo, #jawaBoard, .controls, .output, .output1, .output2");
-            gameElements.forEach(el => el.style.display = "none");
+            gameContainer.style.display = "none";
 
             const gameOverMessage = document.createElement("div");
             gameOverMessage.style.position = "fixed";
-            gameOverMessage.style.top = "30%";
+            gameOverMessage.style.top = "50%";
             gameOverMessage.style.left = "50%";
             gameOverMessage.style.transform = "translate(-50%, -50%)";
             gameOverMessage.style.backgroundColor = "#FFC4C4";
-            gameOverMessage.style.padding = "20px";
-            gameOverMessage.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.2)";
+            gameOverMessage.style.padding = "25px";
+            gameOverMessage.style.boxShadow = "0 4px 10px rgba(0, 0, 0, 0.3)";
             gameOverMessage.style.textAlign = "center";
+            gameOverMessage.style.borderRadius = "12px";
+            gameOverMessage.style.minWidth = "280px";
             gameOverMessage.innerHTML = `
-                <h1>Game Over</h1>
-                <h2>Skor Anda: </h2>
-                <h1>${((score / totalQuestions) * 100).toFixed(1)}</h1>
-                <h3>Sabar nggih ...</h3>
-                <h3>kanggo main maneh</h3>
-                <h2>Refresh halaman! </h2>
+                <h1 style="margin-top:0;">Game Over</h1>
+                <hr>
+                <p style="font-size: 18px; margin: 10px 0;"><strong>Nama:</strong> ${namaSiswa}</p>
+                <p style="font-size: 18px; margin: 10px 0;"><strong>No. Absen:</strong> ${absenSiswa}</p>
+                <h2>Skor Anda:</h2>
+                <h1 style="font-size: 48px; color: #A00101; margin: 10px 0;">${((score / totalQuestions) * 100).toFixed(1)}</h1>
+                <p>Sabar nggih... kanggo main maneh</p>
+                <h3>Refresh halaman!</h3>
             `;
             playSoundGameOver();
             document.body.appendChild(gameOverMessage);
@@ -425,31 +524,32 @@
 
         function gameFinish() {
             clearInterval(timer);
-            const gameElements = document.querySelectorAll("#gameInfo, #jawaBoard, .controls, .output, .output1, .output2");
-            gameElements.forEach(el => el.style.display = "none");
+            gameContainer.style.display = "none";
 
             const gameFinishMessage = document.createElement("div");
             gameFinishMessage.style.position = "fixed";
-            gameFinishMessage.style.top = "30%";
+            gameFinishMessage.style.top = "50%";
             gameFinishMessage.style.left = "50%";
             gameFinishMessage.style.transform = "translate(-50%, -50%)";
             gameFinishMessage.style.backgroundColor = "#CCF7F5";
-            gameFinishMessage.style.padding = "20px";
-            gameFinishMessage.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.2)";
+            gameFinishMessage.style.padding = "25px";
+            gameFinishMessage.style.boxShadow = "0 4px 10px rgba(0, 0, 0, 0.3)";
             gameFinishMessage.style.textAlign = "center";
+            gameFinishMessage.style.borderRadius = "12px";
+            gameFinishMessage.style.minWidth = "280px";
             gameFinishMessage.innerHTML = `
-                <h1>Game Finish</h1>
-                <h2>Skor Anda: </h2>
-                <h1>${((score / totalQuestions) * 100).toFixed(1)}</h1>
-                <h3>Alhamdulillah ...</h3>
-                <h3>kanggo main maneh</h3>
-                <h2>Refresh halaman! </h2>
+                <h1 style="margin-top:0;">Game Finish</h1>
+                <hr>
+                <p style="font-size: 18px; margin: 10px 0;"><strong>Nama:</strong> ${namaSiswa}</p>
+                <p style="font-size: 18px; margin: 10px 0;"><strong>No. Absen:</strong> ${absenSiswa}</p>
+                <h2>Skor Anda:</h2>
+                <h1 style="font-size: 48px; color: #055205; margin: 10px 0;">${((score / totalQuestions) * 100).toFixed(1)}</h1>
+                <p>Alhamdulillah... kanggo main maneh</p>
+                <h3>Refresh halaman!</h3>
             `;
             playSoundFinish();
             document.body.appendChild(gameFinishMessage);
         }
-
-        window.onload = startGame;
     </script>
 </body>
 </html>
